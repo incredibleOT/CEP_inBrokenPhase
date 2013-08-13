@@ -1,0 +1,14 @@
+This Program should determin the "phase structure" from the CEP, while still assuming to be in the broken phase.
+
+The prrinciple is the following:
+
+ - we use the continuum notation (m_0^2, lambda, y, lambda_6), but keep all lattice expressions like sums etc
+ - The potential we use is the one for the determination of the lower bound
+ - we set all parameters, also m_0^2
+ - now the program iterates
+   {
+ 	- determine minimum
+ 	- determin mass in the minimum
+ 	- set mass in propagator sum
+   }
+   until the minimum is stable
