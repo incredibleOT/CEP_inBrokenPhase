@@ -80,7 +80,7 @@ void constrainedEffectivePotential_inBrokenPhase::reinitialize(){}
 
 
 //getting parameters
-double constrainedEffectivePotential_inBrokenPhase::get_moSquared(){ return m0Squared; }
+double constrainedEffectivePotential_inBrokenPhase::get_m0Squared(){ return m0Squared; }
 double constrainedEffectivePotential_inBrokenPhase::get_yukawa_t(){ return yukawa_t; }
 double constrainedEffectivePotential_inBrokenPhase::get_yukawa_b(){ return yukawa_b; }
 double constrainedEffectivePotential_inBrokenPhase::get_lambda(){ return lambda; }
@@ -1271,6 +1271,11 @@ double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas_
 			                + value*value * ( 108.0*propagatorSum_withZeroMass + 180.0*propagatorSum_withHiggsMass ) );
 }
 
+
+void constrainedEffectivePotential_inBrokenPhase::set_max_numberOfIterations(int new_max){ max_numberOfIterations=new_max; }
+void constrainedEffectivePotential_inBrokenPhase::set_relative_Accuracy( double new_rel_acc){ relative_Accuracy=new_rel_acc; }
+void constrainedEffectivePotential_inBrokenPhase::set_absolute_Accuracy( double new_abs_acc){ absolute_Accuracy=new_abs_acc; }
+
 void constrainedEffectivePotential_inBrokenPhase::set_minimizationAlgorithm( int new_algorithm )
 {
 	// 1 - gsl_min_fminimizer_goldensection
@@ -1328,7 +1333,7 @@ bool constrainedEffectivePotential_inBrokenPhase::initialize_minimizer( double m
 void constrainedEffectivePotential_inBrokenPhase::determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper)
 {
 	const int MAXSCAN=1000;
-	if( (inUpper - inLower < 0.0 || inStep <=0.0) )
+	if( (inUpper - inLower <= 0.0 || inStep <=0.0) )
 	{
 		std::cerr <<"Error, inconsitent scan range in constrainedEffectivePotential_inBrokenPhase::determine_startingAndInitialize" <<std::endl;
 		exit(EXIT_FAILURE);
@@ -1349,6 +1354,11 @@ void constrainedEffectivePotential_inBrokenPhase::determine_startingPoints( doub
 	{
 		trial_functionAndPoints.insert( std::make_pair( compute_CEP_inBrokenPhase( *iter ), *iter ) );
 	}
+	//debug
+	/*for( std::map< double, double >::const_iterator iter=trial_functionAndPoints.begin(); iter !=trial_functionAndPoints.end(); ++iter)
+	{
+		std::cout <<"trial: value= " <<iter->second <<"   pot: " <<iter->first <<std::endl;
+	}*/
 	double lowest=trial_functionAndPoints.begin()->second;
 	if( lowest==*trialPoints.begin() || lowest==*trialPoints.rbegin() )
 	{
@@ -1381,6 +1391,15 @@ double constrainedEffectivePotential_inBrokenPhase::get_actual_minimum()
 	return gsl_min_fminimizer_x_minimum(minimizer);
 }
 
+double constrainedEffectivePotential_inBrokenPhase::get_potentialAtMinimum()
+{
+	if(!minimizerInitialized)
+	{
+		std::cerr <<"Error, minimizer not initialized in constrainedEffectivePotential_inBrokenPhase::get_actual_minimum()" <<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	return gsl_min_fminimizer_f_minimum(minimizer);
+}
 
 void constrainedEffectivePotential_inBrokenPhase::get_actual_Interval( double &outMinimum, double &outLower,double &outUpper )
 {

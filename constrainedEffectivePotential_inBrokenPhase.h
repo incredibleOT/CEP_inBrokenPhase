@@ -70,7 +70,6 @@ class constrainedEffectivePotential_inBrokenPhase
 	                           // 3 - gsl_min_fminimizer_quad_golden
 	                           //default 1
 	
-	
 	//stuff for gsl
 	gsl_min_fminimizer *minimizer;
 	gsl_function functionHandler;
@@ -99,7 +98,7 @@ class constrainedEffectivePotential_inBrokenPhase
 	
 	void reinitialize();
 	
-	double get_moSquared();
+	double get_m0Squared();
 	double get_yukawa_t();
 	double get_yukawa_b();
 	double get_lambda();
@@ -137,6 +136,10 @@ class constrainedEffectivePotential_inBrokenPhase
 	
 	
 	//stuff for the minimizer
+	
+	void set_max_numberOfIterations(int new_max);
+	void set_relative_Accuracy( double new_rel_acc);
+	void set_absolute_Accuracy( double new_abs_acc);
 	void set_minimizationAlgorithm( int new_algorithm );
 	bool reInitialize_minimizer( double minimum, double lower, double upper );
 	bool initialize_minimizer( double minimum, double lower, double upper );
@@ -145,6 +148,7 @@ class constrainedEffectivePotential_inBrokenPhase
 	
 	int iterate_minimizer();
 	double get_actual_minimum();
+	double get_potentialAtMinimum();
 	void get_actual_Interval( double &outMinimum, double &outLower,double &outUpper );
 	bool check_convergence();//calls the gsl routine for checking the convergence
 	int iterate_minimizer_until_convergence(); //returns number of iteration needed,
