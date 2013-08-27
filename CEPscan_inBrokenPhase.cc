@@ -167,7 +167,12 @@ int main(int narg,char **arg)
 						{
 							CEP.set_m0Squared( *m0Squared_or_kappa );
 						}
-						cout <<"               m0Squared=" <<CEP.get_m0Squared() <<endl;
+						cout <<"               m0Squared=" <<CEP.get_m0Squared();
+						if(parametersIsSet["use_kappa"] && parametersInt["use_kappa"])
+						{
+							cout <<" (kappa=" <<*m0Squared_or_kappa <<")";
+						}
+						cout <<endl;
 						
 						
 						

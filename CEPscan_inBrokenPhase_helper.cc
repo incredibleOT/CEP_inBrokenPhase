@@ -396,7 +396,7 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 			std::ostringstream ss;
 			ss <<"m0Sq_";
 			ss.precision(7);
-			if(paraI["scan_kappa"]){ss <<paraD["m0Squared_min"] <<"_"<<paraD["m0Squared_max"]; }
+			if(paraI["scan_m0Squared"]){ss <<paraD["m0Squared_min"] <<"_"<<paraD["m0Squared_max"]; }
 			else {ss <<paraD["m0Squared"]; }
 			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
 		}

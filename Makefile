@@ -23,7 +23,13 @@ CEPscan_inBrokenPhase: CEPscan_inBrokenPhase.o ${OFILES}
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
 
 CEPscan_inBrokenPhase.o: CEPscan_inBrokenPhase.cc 
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<
 
+plotPotential_inBrokenPhase: plotPotential_inBrokenPhase.o constrainedEffectivePotential_inBrokenPhase.o plotPotential_inBrokenPhase_helper.o
+	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
+
+plotPotential_inBrokenPhase.o: plotPotential_inBrokenPhase.cc
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<
 
 test_CEP_inBrokenPhase: test_CEP_inBrokenPhase.o ${OFILES}
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
@@ -39,7 +45,10 @@ constrainedEffectivePotential_inBrokenPhase.o: constrainedEffectivePotential_inB
 
 CEPscan_inBrokenPhase_helper.o: CEPscan_inBrokenPhase_helper.cc CEPscan_inBrokenPhase_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $< 
-	
+
+plotPotential_inBrokenPhase_helper.o: plotPotential_inBrokenPhase_helper.cc plotPotential_inBrokenPhase_helper.h
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $< 
+
 clean:
 	rm *.o *~
 
