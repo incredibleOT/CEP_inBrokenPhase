@@ -16,7 +16,7 @@ void CEPscan_inBrokenPhase_helper::prepareParameterMaps( std::map< std::string, 
 	paraD["m0Squared_step"]   = 0.0;
 
 	paraI["use_kappa"]        = 0;
-	paraI["scan_kappa"]       = 0.0;
+	paraI["scan_kappa"]       = 0;
 	paraD["kappa"]            = 0.0;
 	paraD["kappa_min"]        = 0.0;
 	paraD["kappa_max"]        = 0.0;
