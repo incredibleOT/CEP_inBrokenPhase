@@ -230,7 +230,7 @@ int main(int narg,char **arg)
 							if(lower==0.0){lower=parametersDouble["testvalue_min"]; }
 							
 							
-							cout <<"start with interval " <<lower <<"<" <<min <<"<" <<upper <<endl;
+// 							cout <<"start with interval " <<lower <<"<" <<min <<"<" <<upper <<endl;
 							CEP.initialize_minimizer(min, lower, upper);
 							int n_of_iter=CEP.iterate_minimizer_until_convergence();
 							old_HiggsMassSquared=CEP.get_actual_HiggsMassSquared();
