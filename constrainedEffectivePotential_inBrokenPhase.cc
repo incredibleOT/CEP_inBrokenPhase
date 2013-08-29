@@ -1196,7 +1196,8 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 	//              z_t/b = nu  +  y_t/b * v * ( 1 - 1/(2 rho)*nu)  with nu being the eigenvalue of the overlap 
 	
 	if(eigenvalues_of_overlap==0){ fill_eigenvaluesAndFactors(); }
-	double dummy(0.0);
+	long double dummy(0.0);
+// 	double dummy(0.0);
 	double fac_t=yukawa_t*value;
 	double fac_b=yukawa_b*value;
 	std::complex< double > z_t, z_b;
@@ -1204,11 +1205,13 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 	{
 		z_t=eigenvalues_of_overlap[counter] + fac_t*(1.0 - eigenvalues_of_overlap[counter]*one_ov_two_rho);
 		z_b=eigenvalues_of_overlap[counter] + fac_b*(1.0 - eigenvalues_of_overlap[counter]*one_ov_two_rho);
-		dummy += factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) ) + log( real( z_b * conj(z_b) ) ) );
+		dummy += static_cast< long double >( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) ) + log( real( z_b * conj(z_b) ) ) ) );
+// 		dummy += ( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) ) + log( real( z_b * conj(z_b) ) ) ) );
 	}
 	dummy*=-2.0*static_cast< double >(N_f);
 	dummy/= static_cast< double >(L0); dummy/= static_cast< double >(L1); dummy/= static_cast< double >(L2); dummy/= static_cast< double >(L3);
-	return dummy;
+	return static_cast< double >(dummy);
+// 	return (dummy);
 }
 
 double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas( double value )
