@@ -136,6 +136,7 @@ int main(int narg,char **arg)
 	
 	cout <<"start scanning" <<endl;
 	std::vector< CEPscan_inBrokenPhase_helper::resultForOutput > results;
+	double lastHiggsMassSquared(0.0);
 	//now iterate
 	for(std::set< double >::const_iterator yukawa_t=yukawa_t_values.begin(); yukawa_t!=yukawa_t_values.end(); ++yukawa_t)
 	{
@@ -184,7 +185,7 @@ int main(int narg,char **arg)
 						while(toContinue)
 						{
 							++counter;
-							if(counter==1){ CEP.init_HiggsMassSquared(); }
+							if(counter==1){ CEP.set_HigsMassSquared(lastHiggsMassSquared); }
 							else{ CEP.set_HigsMassSquared( new_HiggsMassSquared ); }
 							double min(0.0), lower(0.0), upper(0.0);
 							CEP.determine_startingPoints(parametersDouble["testvalue_min"], parametersDouble["testvalue_max"], parametersDouble["testvalue_step"], min, lower, upper);
@@ -270,6 +271,7 @@ int main(int narg,char **arg)
 						dummy.mHSquared = new_HiggsMassSquared;
 						dummy.potential = CEP.get_potentialAtMinimum();
 						results.push_back(dummy);
+						lastHiggsMassSquared=new_HiggsMassSquared;
 					}//m0Squared_or_kappa
 				}//lambda
 			}//lambda_6
