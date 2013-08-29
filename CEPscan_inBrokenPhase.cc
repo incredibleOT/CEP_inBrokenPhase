@@ -136,7 +136,7 @@ int main(int narg,char **arg)
 	
 	cout <<"start scanning" <<endl;
 	std::vector< CEPscan_inBrokenPhase_helper::resultForOutput > results;
-	double lastHiggsMassSquared(0.0);
+	double lastHiggsMassSquared(0.001);
 	//now iterate
 	for(std::set< double >::const_iterator yukawa_t=yukawa_t_values.begin(); yukawa_t!=yukawa_t_values.end(); ++yukawa_t)
 	{
@@ -230,7 +230,7 @@ int main(int narg,char **arg)
 							if(lower==0.0){lower=parametersDouble["testvalue_min"]; }
 							
 							
-// 							cout <<"start with interval " <<lower <<"<" <<min <<"<" <<upper <<endl;
+							cout <<"start with interval " <<lower <<"<" <<min <<"<" <<upper <<endl;
 							CEP.initialize_minimizer(min, lower, upper);
 							int n_of_iter=CEP.iterate_minimizer_until_convergence();
 							old_HiggsMassSquared=CEP.get_actual_HiggsMassSquared();
