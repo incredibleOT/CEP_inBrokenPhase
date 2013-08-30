@@ -20,6 +20,8 @@ namespace CEPscan_inBrokenPhase_helper
 	
 	void streamSetParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, std::ostream &output, const std::string &prefix = "");
 	
+	void streamParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::ostream &output, const std::string &prefix = "");
+	
 	bool checkConsistencyOfParameters( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
 	
 	void fillSetWithRange( const double min, const double max, const double step, std::set< double > &toFill );

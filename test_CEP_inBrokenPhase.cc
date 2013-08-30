@@ -9,10 +9,10 @@ using std::endl;
 int main(int narg,char **arg)
 {
 // 	int L0(6), L1(6), L2(6), L3(6);
-	int L0(32), L1(32), L2(32), L3(32);
+	int L0(32), L1(32), L2(32), L3(64);
 	bool anti(false);
-// 	double y_t(175.0/246.0);
-	double y_t(0.75);
+	double y_t(175.0/246.0);
+// 	double y_t(0.75);
 	double m0Squared(-0.941952694810136);
 	double lambda(0.1);
 	double lambda_6(0.1);
@@ -28,6 +28,24 @@ int main(int narg,char **arg)
 	CEP.init_HiggsMassSquared();
 	
 // 	CEP.set_HigsMassSquared(HiggsMassSquared);
+
+	//load List of fermionic contributions:
+	std::string listOfContr("ListOfFermionicContributions/mt175_L32T64/CEP_fermCont_mt175_L32T64_v_0.0000001_1.2_0.0000001.txt");
+// 	CEP.load_fermionicContribution
+	cout <<"load list of fermionic contributions" <<endl;
+	
+	if(CEP.load_fermionicContribution( listOfContr ))
+	{
+		cout <<"Success" <<endl;
+	}
+	else
+	{
+		cout <<"No success" <<endl;
+	}
+
+
+
+
 	cout.precision(15);
 	cout <<"actual mHSquared: " <<CEP.get_actual_HiggsMassSquared() <<endl;
 	cout <<"propsum(0.0): " <<CEP.compute_propagatorSum(0.0) <<endl;
@@ -55,6 +73,11 @@ int main(int narg,char **arg)
 // 		cout <<"iteration " <<i <<"   actual minimum at: " <<min <<"   lower: " <<low <<"   upper: " <<up <<"    status: " <<iterOutput 
 // 		     <<"   converged: " <<CEP.check_convergence() <<endl;
 // 	}
+	
+	
+	//
+	
+	
 	
 	
 	bool toContinue(true);

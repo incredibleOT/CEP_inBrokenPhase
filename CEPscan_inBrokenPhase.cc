@@ -144,6 +144,15 @@ int main(int narg,char **arg)
 		{
 			CEP.set_yukawas(*yukawa_t, *yukawa_t * (*yukawa_ratio));
 			cout <<"y_t=" <<CEP.get_yukawa_t() <<"  y_b=" <<CEP.get_yukawa_b() <<endl;
+			if(parametersIsSet["use_listOfFermContr"] && parametersInt["use_listOfFermContr"])
+			{
+				cout <<"Load list of fermionic contributions from" <<endl << parametersString["listOfFermContr"] <<endl;
+				if( ! (CEP.load_fermionicContribution( parametersString["listOfFermContr"] ) ) )
+				{
+					cerr <<"Error loading list of fermionic contributions!" <<endl;
+					exit(EXIT_FAILURE);
+				}
+			}	
 			for(std::set< double >::const_iterator lambda_6=lambda_6_values.begin(); lambda_6!=lambda_6_values.end(); ++lambda_6)
 			{
 				CEP.set_lambda_6(*lambda_6);
@@ -314,11 +323,12 @@ int main(int narg,char **arg)
 	
 	if(parametersDouble.size()+parametersInt.size()+parametersString.size() != numberOfParameters || parametersIsSet.size()!=numberOfParameters )
 	{
-		cerr <<"Error, number of parameters changed!" <<endl;
+		cerr <<"Error, number of parameters changed! It was " <<numberOfParameters <<"in the beginning." <<endl;
 		cerr <<"parametersDouble.size()=" <<parametersDouble.size() <<endl;
 		cerr <<"parametersInt.size()=" <<parametersInt.size() <<endl;
 		cerr <<"parametersString.size()=" <<parametersString.size() <<endl;
 		cerr <<"parametersIsSet.size()=" <<parametersIsSet.size() <<endl;
+		CEPscan_inBrokenPhase_helper::streamParameterMaps(parametersDouble, parametersInt, parametersString, cout);
 		exit(EXIT_FAILURE);
 	}
 	

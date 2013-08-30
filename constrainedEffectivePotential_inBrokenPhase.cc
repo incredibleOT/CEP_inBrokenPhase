@@ -10,7 +10,8 @@ eigenvalues_of_overlap(0), factor_for_eigenvalues(0), four_times_sum_of_sinSquar
 propagatorSum_withZeroMass(-1.0), propagatorSum_withHiggsMass(-1.0), actual_HiggsMassSquared(0.0),
 numberOfDistingtMomenta_fermions(0), numberOfDistingtMomenta_bosons(0),
 max_numberOfIterations(100), relative_Accuracy(1.0e-7), absolute_Accuracy(1.0e-7),minimizationAlgorithm(1),
-minimizer(NULL), algorithmForMinimization(gsl_min_fminimizer_goldensection), minimizerInitialized(false), iterator_status(0)
+minimizer(NULL), algorithmForMinimization(gsl_min_fminimizer_goldensection), minimizerInitialized(false), iterator_status(0),
+fermionicContributions_are_valid(false)
 {
 	if( L0%2 + L1%2 + L2%2 + L3%2 != 0 )
 	{
@@ -40,7 +41,16 @@ void constrainedEffectivePotential_inBrokenPhase::set_m0Squared( double new_m0Sq
 }
 void constrainedEffectivePotential_inBrokenPhase::set_yukawas( double y_t, double y_b )
 { 
-	if( yukawa_t != y_t || yukawa_b != y_b ){ yukawa_t=y_t; yukawa_b=y_b; if(eigenvalues_of_overlap!=0){fill_eigenvaluesAndFactors(); } } reinitialize(); 
+	if( yukawa_t != y_t || yukawa_b != y_b )
+	{ 
+		yukawa_t=y_t; yukawa_b=y_b; if(eigenvalues_of_overlap!=0){fill_eigenvaluesAndFactors(); }
+		//
+		fermionicContributions.clear();
+		fermionicContributions_are_valid=false;
+	} 
+		
+	
+	reinitialize();
 }
 void constrainedEffectivePotential_inBrokenPhase::set_lambda( double new_lambda ){ if(lambda != new_lambda){ lambda = new_lambda; reinitialize(); } }
 void constrainedEffectivePotential_inBrokenPhase::set_lambda_6( double new_lambda_6 ){ if(lambda_6 != new_lambda_6 ){ lambda_6=new_lambda_6; reinitialize(); } }
@@ -1196,6 +1206,21 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 	//              z_t/b = nu  +  y_t/b * v * ( 1 - 1/(2 rho)*nu)  with nu being the eigenvalue of the overlap 
 	
 	if(eigenvalues_of_overlap==0){ fill_eigenvaluesAndFactors(); }
+	
+	if(fermionicContributions_are_valid)
+	{
+		//NOTE lower is a bad name, lower is equal or lager than value!
+		std::map< double, double >::const_iterator lower=fermionicContributions.lower_bound( value );
+		if(lower->first==value){ return lower->second; }
+		else if(lower != fermionicContributions.end() && lower != fermionicContributions.begin())
+		{
+			std::map< double, double >::const_iterator lower_min_one=lower;
+			--lower_min_one;
+			double deriv( (lower->second - lower_min_one->second)/(lower->first - lower_min_one->first) );
+			return (lower_min_one->second + (value - lower_min_one->first)*deriv);
+		}
+	}
+	
 	long double dummy(0.0);
 // 	double dummy(0.0);
 	double fac_t=yukawa_t*value;
@@ -1273,6 +1298,56 @@ double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas_
 								 + 90.0*propagatorSum_withHiggsMass*propagatorSum_withHiggsMass)
 			                + value*value * ( 108.0*propagatorSum_withZeroMass + 180.0*propagatorSum_withHiggsMass ) );
 }
+
+bool constrainedEffectivePotential_inBrokenPhase::load_fermionicContribution( const std::string &fileName )
+{
+	fermionicContributions.clear();
+	fermionicContributions_are_valid=false;
+	double tolForCheck=1.0e-14;
+	if(yukawa_t==0.0 && yukawa_b==0.0)
+	{
+		std::cerr <<"Error, no yukawa couplings set" <<std::endl;
+		return false;
+	}
+	std::ifstream inputFile(fileName.c_str());
+	std::string line,word;
+	double dummy1(0.0),dummy2(0.0);
+	if(!(inputFile.good()))
+	{
+		std::cerr <<"Error opening inputfile " <<fileName <<std::endl;
+		return false;
+	}
+	std::map< double, double >::iterator hintIter=fermionicContributions.begin();
+	while(inputFile)
+	{
+		getline(inputFile, line);
+		if(line.size()==0 || line[0] =='#' || line.find_first_not_of(' ') == std::string::npos){ continue; }
+		std::istringstream strm(line);
+		if(!(strm >> dummy1 >> dummy2))
+		{
+			std::cerr <<"Error reading list of fermionic contributions from " <<fileName <<std::endl;
+			fermionicContributions.clear();
+			return false;
+		}
+		hintIter=fermionicContributions.insert( hintIter, std::make_pair(dummy1, dummy2) );
+		if(inputFile.eof()){ break; }
+	}
+	inputFile.close(); inputFile.clear();
+	
+	//check first and last value for agreement...
+	double resBegin=compute_fermionicContribution(fermionicContributions.begin()->first);
+	double resEnd  =compute_fermionicContribution(fermionicContributions.rbegin()->first);
+	if( (0.5*std::abs( resBegin - fermionicContributions.begin()->second )/(resBegin+fermionicContributions.begin()->second) ) > tolForCheck || (0.5*std::abs( resEnd- fermionicContributions.rbegin()->second )/(resEnd+fermionicContributions.rbegin()->second) ) > tolForCheck )
+	{
+		std::cerr <<"Error, loaded list does not agree within accuracy" <<std::endl;
+		fermionicContributions.clear();
+		return false;
+	}
+	fermionicContributions_are_valid=true;
+	return true;
+}//load_fermionicContribution
+
+
 
 
 void constrainedEffectivePotential_inBrokenPhase::set_max_numberOfIterations(int new_max){ max_numberOfIterations=new_max; }

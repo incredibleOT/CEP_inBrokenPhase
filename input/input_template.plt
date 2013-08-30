@@ -42,6 +42,9 @@ yukawa_ratio               1
 # yukawa_ratio_max
 # yukawa_ratio_step
 
+use_listOfFermContr        0
+##a file withe v   U_f(v) 
+# listOfFermContr            filename.txt
 
 ## default: N_f=1, rho=1, r=0.5
 # N_f                       1

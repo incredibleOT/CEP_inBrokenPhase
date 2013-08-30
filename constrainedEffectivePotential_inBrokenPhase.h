@@ -20,9 +20,11 @@ The prrinciple is the following:
 #include <cmath>
 #include <complex>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
+#include <sstream>
 #include <utility>
 
 #include "gsl/gsl_errno.h"
@@ -77,6 +79,11 @@ class constrainedEffectivePotential_inBrokenPhase
 	bool minimizerInitialized;
 	int iterator_status;//stores the output of the iterator (some gsl enum)
 	
+	
+	//map with fermionic contributions (if available)
+	std::map< double, double > fermionicContributions;
+	bool fermionicContributions_are_valid;
+	
 	public:
 	
 	//constructor and destructor
@@ -127,6 +134,8 @@ class constrainedEffectivePotential_inBrokenPhase
 	double compute_treeLevel( double value );
 	double compute_fermionicContribution( double value );
 	double compute_firstOrderInLambdas( double value );
+	//
+	bool load_fermionicContribution( const std::string &fileName );
 	
 	double compute_CEP_inBrokenPhase_secondDerivative( double value );
 	//parts for CEP_secondDerivative

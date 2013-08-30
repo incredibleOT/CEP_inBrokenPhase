@@ -45,6 +45,9 @@ void CEPscan_inBrokenPhase_helper::prepareParameterMaps( std::map< std::string, 
 	paraD["yukawa_ratio_min"] = 0.0;        
 	paraD["yukawa_ratio_max"] = 0.0;
 	paraD["yukawa_ratio_step"]= 0.0;
+	
+	paraI["use_listOfFermContr"]=0;
+	paraS["listOfFermContr"]    ="";
 
 
 	// default: N_f=1, rho=1, r=0.5
@@ -169,6 +172,27 @@ void CEPscan_inBrokenPhase_helper::streamSetParameterMaps( std::map< std::string
 	}
 }//streamSetParameterMaps
 
+
+
+
+void CEPscan_inBrokenPhase_helper::streamParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::ostream &output, const std::string &prefix)
+{
+	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
+	{
+		if(!(prefix=="")){output <<prefix <<" ";}  
+		output <<iter->first <<"     " <<iter->second <<std::endl;
+	}
+	for( std::map< std::string, int >::const_iterator iter=paraI.begin(); iter!=paraI.end(); ++iter )
+	{
+		if(!(prefix=="")){output <<prefix <<" ";}  
+		output <<iter->first <<"     " <<iter->second <<std::endl;
+	}
+	for( std::map< std::string, std::string >::const_iterator iter=paraS.begin(); iter!=paraS.end(); ++iter )
+	{
+		if(!(prefix=="")){output <<prefix <<" ";}  
+		output <<iter->first <<"     " <<iter->second <<std::endl;
+	}
+}//streamParameterMaps
 
 
 
@@ -306,6 +330,21 @@ bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters( std::map< std::
 			return false;
 		}
 	}
+	//listOfFermContr
+	if( paraIsSet["use_listOfFermContr"] && paraI["use_listOfFermContr"] )
+	{
+		if( !paraIsSet["listOfFermContr"] || paraS["listOfFermContr"].compare("")==0  )
+		{
+			std::cerr <<"Error, no listOfFermContr given!" <<std::endl;
+			return false;
+		}
+		if( paraI["scan_yukawa_t"] || paraI["scan_yukawa_ratio"] )
+		{
+			std::cerr <<"Error, use_listOfFermContr with scanning in yukawa_t or yukawa_r" <<std::endl;
+			return false;
+		}
+	}
+	
 	//testvalue
 	if(!(paraIsSet["testvalue_min"] && paraIsSet["testvalue_max"] && paraIsSet["testvalue_step"]))
 	{
