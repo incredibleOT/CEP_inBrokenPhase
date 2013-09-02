@@ -1,8 +1,9 @@
-CXX=g++-4.7
+# CXX=g++
+# # CXXFLAGS=-DF_
+# CXXFLAGS= -Wall -Wextra -Wno-long-long -pedantic -O2
 
-# CXXFLAGS=-DF_
-CXXFLAGS= -Wall -Wextra -Wno-long-long -pedantic 
-
+CXX=icpc
+CXXFLAGS= -Wall -w1 -O2
 
 OFILES = constrainedEffectivePotential_inBrokenPhase.o CEPscan_inBrokenPhase_helper.o
 
@@ -35,6 +36,18 @@ test_CEP_inBrokenPhase: test_CEP_inBrokenPhase.o ${OFILES}
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
 
 test_CEP_inBrokenPhase.o: test_CEP_inBrokenPhase.cc ${OFILES}
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<
+
+speedTest_CEP_inBrokenPhase: speedTest_CEP_inBrokenPhase.o ${OFILES}
+	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
+
+speedTest_CEP_inBrokenPhase.o: speedTest_CEP_inBrokenPhase.cc ${OFILES}
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<
+
+generate_list_of_fermionic_contribution: generate_list_of_fermionic_contribution.o ${OFILES}
+	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
+
+generate_list_of_fermionic_contribution.o: generate_list_of_fermionic_contribution.cc ${OFILES}
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<
 
 ###########################################3

@@ -9,7 +9,7 @@ using std::endl;
 int main(int narg,char **arg)
 {
 // 	int L0(6), L1(6), L2(6), L3(6);
-	int L0(128), L1(128), L2(128), L3(256);
+	int L0(192), L1(192), L2(192), L3(384);
 	bool anti(false);
 	double y_t(175.0/246.0);
 // 	double y_t(175);
