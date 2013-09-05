@@ -30,7 +30,7 @@ lambda_6                    0.3
 
 ## 175/246=0.711382114    500/246=2.032520325
 # scan_yukawa_t           1
-yukawa_t                  0.75
+yukawa_t                  0.711382114
 # yukawa_t_min            0.5
 # yukawa_t_max            3.0
 # yukawa_t_step           0.1
@@ -41,6 +41,9 @@ yukawa_ratio               1
 # yukawa_ratio_min         
 # yukawa_ratio_max
 # yukawa_ratio_step
+
+#if set, the contributions from the goldstones will be ignored (basically setting simlpy the propagator sums to zero))
+exclude_goldstones         0
 
 use_listOfFermContr        0
 ##a file withe v   U_f(v) 
@@ -65,8 +68,8 @@ tolerance_for_HiggsMassSquared        1.0e-5
 minimization_algorithm         2
 
 # before the minimization starts, a scan is performed to find the initial guess
-testvalue_min                    0.05 
-testvalue_max                    5.05 
+testvalue_min                    1.0e-7 
+testvalue_max                    3.05 
 testvalue_step                    0.05
 
 

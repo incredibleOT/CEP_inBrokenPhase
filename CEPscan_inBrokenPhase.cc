@@ -56,13 +56,13 @@ int main(int narg,char **arg)
 	constrainedEffectivePotential_inBrokenPhase CEP(Ls,Ls,Ls,Lt,parametersInt["antiperiodic_L_t"]);
 	
 	
-	
 	//set N_f, rho, r if set an different
 	if(parametersIsSet["N_f"] && parametersInt["N_f"]!=CEP.get_N_f()){ CEP.set_N_f(parametersInt["N_f"]); }
 	if(parametersIsSet["rho"] && parametersDouble["rho"]!=CEP.get_rho()){ CEP.set_rho(parametersDouble["rho"]); }
 	if(parametersIsSet["r"] && parametersDouble["r"]!=CEP.get_r()){ CEP.set_rho(parametersDouble["r"]); }
 	
-	
+	//set whether goldstones should be excluded
+	CEP.set_ignore_goldstone_modes(parametersInt["exclude_goldstones"]);
 	
 	//set tolerances and max iterations
 	CEP.set_absolute_Accuracy( parametersDouble["absolut_tolerance_for_minimization"] ); 

@@ -45,6 +45,8 @@ class constrainedEffectivePotential_inBrokenPhase
 	double lambda_6;
 	int N_f; //default 1
 	
+	bool ignore_goldstone_modes;
+	
 	//numerical parameters
 	double rho; //default 1
 	double one_ov_two_rho;
@@ -96,6 +98,8 @@ class constrainedEffectivePotential_inBrokenPhase
 	void set_lambda( double new_lambda );
 	void set_lambda_6( double new_lambda_6 );
 	void set_N_f( int new_N_f);
+	
+	void set_ignore_goldstone_modes(bool new_ignore);
 	
 	void set_rho( double new_rho );
 	void set_r( double new_r);

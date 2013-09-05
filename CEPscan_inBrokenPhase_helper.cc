@@ -46,6 +46,8 @@ void CEPscan_inBrokenPhase_helper::prepareParameterMaps( std::map< std::string, 
 	paraD["yukawa_ratio_max"] = 0.0;
 	paraD["yukawa_ratio_step"]= 0.0;
 	
+	paraI["exclude_goldstones"]=0;
+	
 	paraI["use_listOfFermContr"]=0;
 	paraS["listOfFermContr"]    ="";
 

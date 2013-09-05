@@ -4,7 +4,7 @@
 //constructor
 constrainedEffectivePotential_inBrokenPhase::constrainedEffectivePotential_inBrokenPhase(int l0, int l1, int l2, int l3, bool anti):
 L0(l0), L1(l1), L2(l2), L3(l3), antiperiodicBC_L3(anti),
-m0Squared(0.0), yukawa_t(0.0), yukawa_b(0.0), lambda(0.0), lambda_6(0.0), N_f(1),
+m0Squared(0.0), yukawa_t(0.0), yukawa_b(0.0), lambda(0.0), lambda_6(0.0), N_f(1),ignore_goldstone_modes(false),
 rho(1.0), one_ov_two_rho(0.5), r(0.5),
 eigenvalues_of_overlap(0), factor_for_eigenvalues(0), four_times_sum_of_sinSquared(0), factor_for_sum_of_sinSquared(0),
 propagatorSum_withZeroMass(-1.0), propagatorSum_withHiggsMass(-1.0), actual_HiggsMassSquared(0.0),
@@ -55,6 +55,8 @@ void constrainedEffectivePotential_inBrokenPhase::set_yukawas( double y_t, doubl
 void constrainedEffectivePotential_inBrokenPhase::set_lambda( double new_lambda ){ if(lambda != new_lambda){ lambda = new_lambda; reinitialize(); } }
 void constrainedEffectivePotential_inBrokenPhase::set_lambda_6( double new_lambda_6 ){ if(lambda_6 != new_lambda_6 ){ lambda_6=new_lambda_6; reinitialize(); } }
 void constrainedEffectivePotential_inBrokenPhase::set_N_f( int new_N_f){ if(N_f != new_N_f){ N_f=new_N_f; reinitialize(); } }
+
+void constrainedEffectivePotential_inBrokenPhase::set_ignore_goldstone_modes(bool new_ignore){ ignore_goldstone_modes=new_ignore; }
 
 void constrainedEffectivePotential_inBrokenPhase::set_rho( double new_rho )
 {
@@ -1242,11 +1244,20 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas( double value )
 {
 	// U_1st(v) = lambda * 6 * v^2 * ( P_G + P_H )  +  lambda_6 * ( v^2 * ( 45*P_G^2  +  54*P_G*P_H  +  45*P_H^2 )  +  v^4 * ( 9*P_G + 15*P_H ) )
-	return 6.0 * lambda * value*value * (propagatorSum_withHiggsMass + propagatorSum_withZeroMass) 
+	if(  ignore_goldstone_modes  )
+	{
+			return 6.0 * lambda * value*value * (propagatorSum_withHiggsMass ) 
+	                             + lambda_6 * ( value*value * 45.0*propagatorSum_withHiggsMass*propagatorSum_withHiggsMass
+			              + value*value*value*value * 15.0*propagatorSum_withHiggsMass );
+	}
+	else
+	{
+		return 6.0 * lambda * value*value * (propagatorSum_withHiggsMass + propagatorSum_withZeroMass) 
 	       + lambda_6 * ( value*value * ( 45.0*propagatorSum_withZeroMass*propagatorSum_withZeroMass 
 	                                    + 54.0*propagatorSum_withZeroMass*propagatorSum_withHiggsMass
 	                                    + 45.0*propagatorSum_withHiggsMass*propagatorSum_withHiggsMass)
 			              + value*value*value*value * ( 9.0*propagatorSum_withZeroMass + 15.0*propagatorSum_withHiggsMass ) );
+	}
 }
 
 double constrainedEffectivePotential_inBrokenPhase::compute_CEP_inBrokenPhase_secondDerivative( double value )
@@ -1292,11 +1303,20 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas_secondDerivative( double value )
 {
 	// U_1st''(v) = lambda * 12 ( P_G + P_H )  +  lambda_6 * ( ( 90*P_G^2  +  108*P_G*P_H  +  90*P_H^2 )  +  v^2 * ( 108*P_G + 180*P_H ) )
-	return 12.0 * lambda * (propagatorSum_withHiggsMass + propagatorSum_withZeroMass) 
-	       + lambda_6 * ( ( 90.0*propagatorSum_withZeroMass*propagatorSum_withZeroMass 
+	if( ignore_goldstone_modes )
+	{
+		return 12.0 * lambda * (propagatorSum_withHiggsMass ) 
+	                     + lambda_6 * ( 90.0*propagatorSum_withHiggsMass*propagatorSum_withHiggsMass
+			                + value*value * ( 180.0*propagatorSum_withHiggsMass ) );
+	}
+	else
+	{
+		return 12.0 * lambda * (propagatorSum_withHiggsMass + propagatorSum_withZeroMass) 
+	                     + lambda_6 * ( ( 90.0*propagatorSum_withZeroMass*propagatorSum_withZeroMass 
 								 + 108.0*propagatorSum_withZeroMass*propagatorSum_withHiggsMass
 								 + 90.0*propagatorSum_withHiggsMass*propagatorSum_withHiggsMass)
 			                + value*value * ( 108.0*propagatorSum_withZeroMass + 180.0*propagatorSum_withHiggsMass ) );
+	}
 }
 
 bool constrainedEffectivePotential_inBrokenPhase::load_fermionicContribution( const std::string &fileName )
