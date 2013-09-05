@@ -2,6 +2,7 @@
 #define CEPSCAN_INBROKENPHASE_HELPER_H
 
 #include <cstdlib>
+#include <cmath>
 #include <istream>
 #include <iostream>
 #include <fstream>
@@ -40,6 +41,8 @@ namespace CEPscan_inBrokenPhase_helper
 	};
 	
 	bool printResultsVectorToStream(const std::vector< resultForOutput > &results, std::ostream &output);
+	
+	std::map< int, double >::iterator findClosestMass( std::map< int, double > &HiggsMassesSquared, double value );
 	
 	std::string generate_outputFileName(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet );
 	

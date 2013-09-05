@@ -65,14 +65,9 @@ int main(int narg,char **arg)
 	
 	
 	//set tolerances and max iterations
-	if(parametersIsSet["absolut_tolerance_for_minimization"])
-	{
-		CEP.set_absolute_Accuracy( parametersDouble["absolut_tolerance_for_minimization"] ); 
-	}
-	if(parametersIsSet["relative_tolerance_for_minimization"])
-	{
-		CEP.set_relative_Accuracy( parametersDouble["relative_tolerance_for_minimization"] ); 
-	}
+	CEP.set_absolute_Accuracy( parametersDouble["absolut_tolerance_for_minimization"] ); 
+	CEP.set_relative_Accuracy( parametersDouble["relative_tolerance_for_minimization"] ); 
+	
 	if(parametersIsSet["max_numer_of_iterations_minimizer"])
 	{
 		CEP.set_max_numberOfIterations( parametersInt["max_numer_of_iterations_minimizer"] );
@@ -135,6 +130,7 @@ int main(int narg,char **arg)
 	
 	
 	cout <<"start scanning" <<endl;
+	cout.precision(12);
 	std::vector< CEPscan_inBrokenPhase_helper::resultForOutput > results;
 	double lastHiggsMassSquared(0.001);
 	//now iterate
@@ -191,24 +187,38 @@ int main(int narg,char **arg)
 						bool toContinue(true);
 						bool skipValue(false);
 						double old_HiggsMassSquared(0.0), new_HiggsMassSquared(0.0);
+						//the following is for the case of periodic solutions (i.e. arriving at a mass during the iteration where we were already)
+						std::map< int, double > HiggsMassesSquared; //<counter, HiggsMasses>, to test for periodic solutions
+						std::map< int, double > minima; //<counter, minimum>, to test for periodic solutions
+						bool periodic_solution(false);
+						double av_massSquared=0.0;
+						double av_minimum=0.0;
+// 						bool secondIteration(false); //set to true, if periodic solution is found
 						while(toContinue)
 						{
+// 							if(secondIteration)
+// 							{
+// 								CEP.set_absolute_Accuracy( parametersDouble["absolut_tolerance_for_minimization"]*0.1 ); 
+// 								CEP.set_relative_Accuracy( parametersDouble["relative_tolerance_for_minimization"]*0.1);
+// 							}
+// 							else
+// 							{
+// 								CEP.set_absolute_Accuracy( parametersDouble["absolut_tolerance_for_minimization"] ); 
+// 								CEP.set_relative_Accuracy( parametersDouble["relative_tolerance_for_minimization"] );
+// 							}
 							++counter;
 							if(counter==1){ CEP.set_HigsMassSquared(lastHiggsMassSquared); }
 							else{ CEP.set_HigsMassSquared( new_HiggsMassSquared ); }
+							HiggsMassesSquared.insert( std::make_pair( counter, CEP.get_actual_HiggsMassSquared() ) );
 							double min(0.0), lower(0.0), upper(0.0);
 							CEP.determine_startingPoints(parametersDouble["testvalue_min"], parametersDouble["testvalue_max"], parametersDouble["testvalue_step"], min, lower, upper);
 							if(lower==upper)
 							{
-								cerr <<"Error, no minimum found in testvalue interval." <<endl;
+// 								cerr <<"Error, no minimum found in testvalue interval." <<endl;
 								
 								if(lower==0.0 || lower== parametersDouble["testvalue_min"])
 								{
-// 									cerr <<"try decreasing lower bound" <<endl;
-// 									cerr <<"newlower:  " <<parametersDouble["testvalue_min"]/10.0 <<"  newupper: "  <<parametersDouble["testvalue_min"]+parametersDouble["testvalue_min"]/10.0 <<endl;
-// 									//take interval (0:testvalue_min:testvalue_min/10)
-// 									CEP.determine_startingPoints(parametersDouble["testvalue_min"]/10.0, parametersDouble["testvalue_min"]+parametersDouble["testvalue_min"]/10.0, parametersDouble["testvalue_min"]/10.0, min, lower, upper);
-									cerr <<"assume true minimum between first two values" <<endl;
+// 									cerr <<"assume true minimum between first two values" <<endl;
 									bool success(false);
 									double newLower=parametersDouble["testvalue_min"];
 									double newStep=parametersDouble["testvalue_step"];
@@ -221,15 +231,17 @@ int main(int narg,char **arg)
 										CEP.determine_startingPoints(newLower, newUpper, newStep, min, lower, upper);
 										if(lower!=upper){ success=true; break; }
 									}
-									if(success){ cerr <<"success" <<endl; }
-									else
+// 									if(success){ cerr <<"success" <<endl; }
+									if(!success)
 									{
+										cerr <<"Error, no minimum found in testvalue interval." <<endl;
 										skipValue=true;
 										break;
 									}
 								}
 								else
 								{
+									cerr <<"Error, no minimum found in testvalue interval." <<endl;
 									skipValue=true;
 									break;
 								}
@@ -254,12 +266,51 @@ int main(int narg,char **arg)
 								new_HiggsMassSquared=CEP.compute_CEP_inBrokenPhase_secondDerivative(CEP.get_actual_minimum());
 // 								cout <<"minimum: " <<CEP.get_actual_minimum() <<" (" <<n_of_iter <<" iter.)";
 // 								cout <<"  newMassSquared: " <<new_HiggsMassSquared <<endl;
+								cout <<counter <<":  min: " <<CEP.get_actual_minimum() <<"  mHSquared: " <<new_HiggsMassSquared <<endl;
+								minima.insert( std::make_pair( counter, CEP.get_actual_minimum() ) );
 								if( std::abs( 2.0*(new_HiggsMassSquared - old_HiggsMassSquared)/(old_HiggsMassSquared + new_HiggsMassSquared)) <parametersDouble["tolerance_for_HiggsMassSquared"] )
 								{
+									//mass converged
 									cout <<"Mass determination converged after " <<counter <<" iterations" ;
-									cout <<"   minimum: " <<CEP.get_actual_minimum() <<"  mHSquared: " <<new_HiggsMassSquared <<endl;
+									cout <<"   minimum: " <<CEP.get_actual_minimum() <<"  mHSquared: " <<CEP.get_actual_HiggsMassSquared() <<endl;
 									toContinue=false;
+									break; //redundant....
 								}
+								//check for periodic solution
+								std::map< int, double >::iterator closest=CEPscan_inBrokenPhase_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
+								if( std::abs( 2.0*( closest->second - new_HiggsMassSquared)/(closest->second + new_HiggsMassSquared)) < 1.0e-12 )
+								{
+									int period=counter+1-closest->first;
+									cout <<"Periodic solution found! Period=" <<period <<endl;
+									cout <<"take average of values" <<endl;
+									av_massSquared=0.0;
+									av_minimum=0.0;
+									while(closest != HiggsMassesSquared.end())
+									{
+										av_massSquared+=closest->second;
+										std::map< int, double >::iterator minIter=minima.find(closest->first);
+										if(minIter==minima.end())
+										{
+											cerr<<"Error, there is no corresponding minimum. Skip value" <<endl;
+											skipValue=true;
+											toContinue=false;
+											break;
+										}
+										av_minimum+=minIter->second;
+										++closest;
+// 										cout <<"av=" <<av <<endl;
+									}
+									av_massSquared/=static_cast< double >(period);
+									av_minimum/=static_cast< double >(period);
+									toContinue=false;
+									periodic_solution=true;
+									cout <<"Mass determination converged after " <<counter <<" iterations" ;
+									cout <<"   minimum: " <<av_minimum <<"  mHSquared: " <<av_massSquared <<endl;
+									
+								}
+									
+								
+								
 								if(counter==parametersInt["max_numer_of_iterations_HiggsMassSquared"])
 								{
 									cout <<"Mass determination did not converge after " <<parametersInt["max_numer_of_iterations_HiggsMassSquared"];
@@ -276,11 +327,11 @@ int main(int narg,char **arg)
 						dummy.lambda_6  = CEP.get_lambda_6();
 						dummy.yukawa_t  = CEP.get_yukawa_t();
 						dummy.yukawa_b  = CEP.get_yukawa_b();
-						dummy.minimum   = CEP.get_actual_minimum();
-						dummy.mHSquared = new_HiggsMassSquared;
+						dummy.minimum   = (periodic_solution)?(av_minimum):(CEP.get_actual_minimum());
+						dummy.mHSquared = (periodic_solution)?(av_massSquared):(CEP.get_actual_HiggsMassSquared());
 						dummy.potential = CEP.get_potentialAtMinimum();
 						results.push_back(dummy);
-						lastHiggsMassSquared=new_HiggsMassSquared;
+						lastHiggsMassSquared=dummy.mHSquared;
 					}//m0Squared_or_kappa
 				}//lambda
 			}//lambda_6

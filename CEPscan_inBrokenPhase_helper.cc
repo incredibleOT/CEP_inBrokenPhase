@@ -401,6 +401,26 @@ bool CEPscan_inBrokenPhase_helper::printResultsVectorToStream(const std::vector<
 }
 
 
+
+std::map< int, double >::iterator CEPscan_inBrokenPhase_helper::findClosestMass( std::map< int, double > &HiggsMassesSquared, double value )
+{
+	if( HiggsMassesSquared.empty() ){ return HiggsMassesSquared.end(); }
+	
+	std::map< int, double >::iterator closest=HiggsMassesSquared.begin();
+	double smallestDiff=std::abs( value - closest->second );
+	for( std::map< int, double >::iterator iter=closest; iter != HiggsMassesSquared.end(); ++iter)
+	{
+		double actDiff=std::abs(value-iter->second);
+		if( actDiff < smallestDiff )
+		{
+			smallestDiff=actDiff;
+			closest=iter;
+		}
+	}
+	return closest;
+}
+	
+
 std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet )
 {
 	//replaces placeholders in the filename
