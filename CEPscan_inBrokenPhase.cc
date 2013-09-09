@@ -187,10 +187,13 @@ int main(int narg,char **arg)
 						bool toContinue(true);
 						bool skipValue(false);
 						double old_HiggsMassSquared(0.0), new_HiggsMassSquared(0.0);
+						
 						//the following is for the case of periodic solutions (i.e. arriving at a mass during the iteration where we were already)
 						std::map< int, double > HiggsMassesSquared; //<counter, HiggsMasses>, to test for periodic solutions
 						std::map< int, double > minima; //<counter, minimum>, to test for periodic solutions
 						bool periodic_solution(false);
+						const double accuracy_for_periodicity=1.0e-12;//when two masses are assumed to be equal
+						const double maximal_spread_for_periodicity=5.0e-3; //if spread for periodicity is too large, its not an artifact but maybe a fluctuation between two minima
 						double av_massSquared=0.0;
 						double av_minimum=0.0;
 // 						bool secondIteration(false); //set to true, if periodic solution is found
@@ -278,11 +281,16 @@ int main(int narg,char **arg)
 								}
 								//check for periodic solution
 								std::map< int, double >::iterator closest=CEPscan_inBrokenPhase_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
-								if( std::abs( 2.0*( closest->second - new_HiggsMassSquared)/(closest->second + new_HiggsMassSquared)) < 1.0e-12 )
+								if( std::abs( 2.0*( closest->second - new_HiggsMassSquared)/(closest->second + new_HiggsMassSquared)) < accuracy_for_periodicity )
 								{
 									int period=counter+1-closest->first;
 									cout <<"Periodic solution found! Period=" <<period <<endl;
-									cout <<"take average of values" <<endl;
+									//for determin spread of mSquared and minimum
+									double largest_mSquared=closest->second;
+									double smallest_mSquared=closest->second;
+									double largest_minimum= (minima.find(closest->first)!=minima.end()) ? ((minima.find(closest->first)->second)):-1.0;
+									double smallest_minimum=largest_minimum;
+									
 									av_massSquared=0.0;
 									av_minimum=0.0;
 									while(closest != HiggsMassesSquared.end())
@@ -297,20 +305,32 @@ int main(int narg,char **arg)
 											break;
 										}
 										av_minimum+=minIter->second;
+										if(closest->second < smallest_mSquared){ smallest_mSquared=closest->second; }
+										if(closest->second > largest_mSquared){ largest_mSquared=closest->second; }
+										if(minIter->second < smallest_minimum){ smallest_minimum=minIter->second; }
+										if(minIter->second > largest_minimum){ largest_minimum=minIter->second; }
 										++closest;
 // 										cout <<"av=" <<av <<endl;
 									}
-									av_massSquared/=static_cast< double >(period);
-									av_minimum/=static_cast< double >(period);
-									toContinue=false;
-									periodic_solution=true;
-									cout <<"Mass determination converged after " <<counter <<" iterations" ;
-									cout <<"   minimum: " <<av_minimum <<"  mHSquared: " <<av_massSquared <<endl;
+									//if spread is too large, ignore values
+									if(   (0.5*(largest_mSquared-smallest_mSquared)/(largest_mSquared+smallest_mSquared) > maximal_spread_for_periodicity)   ||    (0.5*(largest_minimum-smallest_minimum)/(largest_minimum+smallest_minimum) > maximal_spread_for_periodicity)    )
+									{
+										cout <<"Spread of values during period too large, skip value" <<endl;
+										skipValue=true;
+										toContinue=false;
+									}
+									else
+									{
+										cout <<"take average of values" <<endl;
+										av_massSquared/=static_cast< double >(period);
+										av_minimum/=static_cast< double >(period);
+										toContinue=false;
+										periodic_solution=true;
+										cout <<"Mass determination converged after " <<counter <<" iterations" ;
+										cout <<"   minimum: " <<av_minimum <<"  mHSquared: " <<av_massSquared <<endl;
+									}
 									
 								}
-									
-								
-								
 								if(counter==parametersInt["max_numer_of_iterations_HiggsMassSquared"])
 								{
 									cout <<"Mass determination did not converge after " <<parametersInt["max_numer_of_iterations_HiggsMassSquared"];
