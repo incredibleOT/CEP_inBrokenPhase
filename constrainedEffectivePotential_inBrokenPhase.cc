@@ -1357,7 +1357,13 @@ bool constrainedEffectivePotential_inBrokenPhase::load_fermionicContribution( co
 	//check first and last value for agreement...
 	double resBegin=compute_fermionicContribution(fermionicContributions.begin()->first);
 	double resEnd  =compute_fermionicContribution(fermionicContributions.rbegin()->first);
-	if( (0.5*std::abs( resBegin - fermionicContributions.begin()->second )/(resBegin+fermionicContributions.begin()->second) ) > tolForCheck || (0.5*std::abs( resEnd- fermionicContributions.rbegin()->second )/(resEnd+fermionicContributions.rbegin()->second) ) > tolForCheck )
+	//debug
+	/*std::cout.precision(15);
+	std::cout <<"resBegin = " <<resBegin <<std::endl;
+	std::cout <<"from List= " <<fermionicContributions.begin()->second <<std::endl;
+	std::cout <<"rel dev  = " <<(0.5*std::abs( resBegin - fermionicContributions.begin()->second  )/(resBegin+fermionicContributions.begin()->second) ) <<std::endl; */
+	
+	if( 0.5*std::abs( (resBegin - fermionicContributions.begin()->second )/(resBegin+fermionicContributions.begin()->second) ) > tolForCheck || 0.5*std::abs( (resEnd- fermionicContributions.rbegin()->second )/(resEnd+fermionicContributions.rbegin()->second) ) > tolForCheck )
 	{
 		std::cerr <<"Error, loaded list does not agree within accuracy" <<std::endl;
 		fermionicContributions.clear();
