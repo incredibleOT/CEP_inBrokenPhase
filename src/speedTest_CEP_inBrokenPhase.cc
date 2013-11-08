@@ -6,7 +6,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-int main(int narg,char **arg)
+int main()
 {
 
 // int L0(6), L1(6), L2(6), L3(6);
