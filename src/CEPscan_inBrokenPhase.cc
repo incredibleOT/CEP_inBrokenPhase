@@ -132,7 +132,7 @@ int main(int narg,char **arg)
 	cout <<"start scanning" <<endl;
 	cout.precision(12);
 	std::vector< CEPscan_inBrokenPhase_helper::resultForOutput > results;
-	double lastHiggsMassSquared(0.001);
+	double lastHiggsMassSquared(0.0000001);
 	//now iterate
 	for(std::set< double >::const_iterator yukawa_t=yukawa_t_values.begin(); yukawa_t!=yukawa_t_values.end(); ++yukawa_t)
 	{
