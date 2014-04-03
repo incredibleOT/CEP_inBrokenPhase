@@ -27,6 +27,10 @@ void plotPotential_inBrokenPhase_helper::prepareParameterMaps( std::map< std::st
 	paraD["field_max"]        = 0.0;
 	paraD["field_step"]       = 0.0;
 	
+	paraI["use_listOfFermContr"]=0;
+	paraS["listOfFermContr"]    ="";
+
+	
 	// default: N_f=1, rho=1, r=0.5
 	paraI["N_f"]              = 1;
 	paraD["rho"]              = 1.0;
@@ -227,6 +231,15 @@ bool plotPotential_inBrokenPhase_helper::checkConsistencyOfParameters( std::map<
 	{
 		std::cerr <<"Error, inconsistent scan range in field" <<std::endl;
 		return false;
+	}
+	//listOfFermContr
+	if( paraIsSet["use_listOfFermContr"] && paraI["use_listOfFermContr"] )
+	{
+		if( !paraIsSet["listOfFermContr"] || paraS["listOfFermContr"].compare("")==0  )
+		{
+			std::cerr <<"Error, no listOfFermContr given!" <<std::endl;
+			return false;
+		}
 	}
 	return true;
 }//checkConsistencyOfParameters

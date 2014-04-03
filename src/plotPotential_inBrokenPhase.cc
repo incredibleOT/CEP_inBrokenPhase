@@ -87,6 +87,16 @@ int main(int narg,char **arg)
 	CEP.set_yukawas(parametersDouble["yukawa_t"], parametersDouble["yukawa_t"] * parametersDouble["yukawa_ratio"]);
 	CEP.set_lambda(parametersDouble["lambda"]);
 	CEP.set_lambda_6(parametersDouble["lambda_6"]);
+	//load list of fermionic contributions, if given
+	if(parametersIsSet["use_listOfFermContr"] && parametersInt["use_listOfFermContr"])
+	{
+		cout <<"Load list of fermionic contributions from" <<endl << parametersString["listOfFermContr"] <<endl;
+		if( ! (CEP.load_fermionicContribution( parametersString["listOfFermContr"] ) ) )
+		{
+			cerr <<"Error loading list of fermionic contributions!" <<endl;
+			exit(EXIT_FAILURE);
+		}
+	}
 	if(parametersIsSet["use_kappa"] && parametersInt["use_kappa"])
 	{
 		if(parametersDouble["kappa"]==0.0)
@@ -110,7 +120,7 @@ int main(int narg,char **arg)
 	while(toContinue)
 	{
 		++counter;
-		if(counter==1){ CEP.init_HiggsMassSquared(); }
+		if(counter==1){ CEP.set_HigsMassSquared(0.000001); }
 		else{ CEP.set_HigsMassSquared( new_HiggsMassSquared ); }
 		double min(0.0), lower(0.0), upper(0.0);
 		CEP.determine_startingPoints(parametersDouble["testvalue_min"], parametersDouble["testvalue_max"], parametersDouble["testvalue_step"], min, lower, upper);
