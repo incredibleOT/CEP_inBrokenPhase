@@ -148,6 +148,7 @@ bool CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile( std::map< std::str
 
 void CEPscan_inBrokenPhase_helper::streamSetParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, std::ostream &output, const std::string &prefix)
 {
+	output.precision(10);
 	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
 	{
 		if(paraIsSet[iter->first])
@@ -447,7 +448,7 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 		{
 			std::ostringstream ss;
 			ss <<"k_";
-			ss.precision(7);
+			ss.precision(10);
 			if(paraI["scan_kappa"]){ss <<paraD["kappa_min"] <<"_"<<paraD["kappa_max"]; }
 			else {ss <<paraD["kappa"]; }
 			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
@@ -456,7 +457,7 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 		{
 			std::ostringstream ss;
 			ss <<"m0Sq_";
-			ss.precision(7);
+			ss.precision(10);
 			if(paraI["scan_m0Squared"]){ss <<paraD["m0Squared_min"] <<"_"<<paraD["m0Squared_max"]; }
 			else {ss <<paraD["m0Squared"]; }
 			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
@@ -466,7 +467,7 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 	{
 		std::ostringstream ss;
 		ss <<"l_";
-		ss.precision(7);
+		ss.precision(10);
 		if(paraI["scan_lambda"]){ss <<paraD["lambda_min"] <<"_"<<paraD["lambda_max"]; }
 		else {ss <<paraD["lambda"]; }
 		outputFileName.replace(outputFileName.find("[l]"),3, ss.str() );
@@ -475,7 +476,7 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 	{
 		std::ostringstream ss;
 		ss <<"l6_";
-		ss.precision(7);
+		ss.precision(10);
 		if(paraI["scan_lambda_6"]){ss <<paraD["lambda_6_min"] <<"_"<<paraD["lambda_6_max"]; }
 		else {ss <<paraD["lambda_6"]; }
 		outputFileName.replace(outputFileName.find("[l6]"),4, ss.str() );
