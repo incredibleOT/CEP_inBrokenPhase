@@ -291,7 +291,7 @@ std::string plotPotential_inBrokenPhase_helper::generate_outputFileName(const st
 		{
 			std::ostringstream ss;
 			ss <<"k_";
-			ss.precision(7);
+			ss.precision(10);
 			ss <<paraD["kappa"];
 			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
 		}
@@ -299,7 +299,7 @@ std::string plotPotential_inBrokenPhase_helper::generate_outputFileName(const st
 		{
 			std::ostringstream ss;
 			ss <<"m0Sq_";
-			ss.precision(7);
+			ss.precision(10);
 			ss <<paraD["m0Squared"];
 			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
 		}
