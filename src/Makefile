@@ -4,7 +4,7 @@ CXXFLAGS= -Wall -Wextra -Wno-long-long -pedantic -O2
 # # CXX=icpc
 # # CXXFLAGS= -Wall -w1 -O2
 
-LIBOFILES = constrainedEffectivePotential_inBrokenPhase.o CEPscan_inBrokenPhase_helper.o
+LIBOFILES = constrainedEffectivePotential_inBrokenPhase.o CEPscan_inBrokenPhase_helper.o 
 
 EXECOFILES=CEPscan_inBrokenPhase.o  generate_list_of_fermionic_contribution.o  \
             test_CEP_inBrokenPhase.o  plotPotential_inBrokenPhase.o  speedTest_CEP_inBrokenPhase.o  
@@ -50,8 +50,8 @@ constrainedEffectivePotential_inBrokenPhase.o: constrainedEffectivePotential_inB
 CEPscan_inBrokenPhase_helper.o: CEPscan_inBrokenPhase_helper.cc CEPscan_inBrokenPhase_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $< 
 
-plotPotential_inBrokenPhase_helper.o: plotPotential_inBrokenPhase_helper.cc plotPotential_inBrokenPhase_helper.h
-	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $< 
+# # plotPotential_inBrokenPhase_helper.o: plotPotential_inBrokenPhase_helper.cc plotPotential_inBrokenPhase_helper.h
+# # 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $< 
 
 ##for executables
 CEPscan_inBrokenPhase.o: CEPscan_inBrokenPhase.cc 

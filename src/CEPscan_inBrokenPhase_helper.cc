@@ -91,6 +91,79 @@ void CEPscan_inBrokenPhase_helper::prepareParameterMaps( std::map< std::string, 
 
 
 
+
+void CEPscan_inBrokenPhase_helper::prepareParameterMaps_plotPotential( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+{
+	paraD.clear(); paraI.clear(); paraS.clear(); paraIsSet.clear();
+	
+	paraI["L_s"]=-1;
+	paraI["L_t"]=-1;
+	paraI["antiperiodic_L_t"]=-1;
+	
+	paraD["m0Squared"]        = 0.0;
+
+	paraI["use_kappa"]        = 0;
+	paraD["kappa"]            = 0.0;
+
+	paraD["lambda"]           = 0.0;
+	
+	paraD["lambda_6"]         = 0.0;
+	
+	paraD["yukawa_t"]         = 0.0;
+	
+	paraD["yukawa_ratio"]     = 0.0;
+	
+	//scanrange
+	paraD["field_min"]        = 0.0;
+	paraD["field_max"]        = 0.0;
+	paraD["field_step"]       = 0.0;
+	
+	paraI["use_listOfFermContr"]=0;
+	paraS["listOfFermContr"]    ="";
+
+	
+	// default: N_f=1, rho=1, r=0.5
+	paraI["N_f"]              = 1;
+	paraD["rho"]              = 1.0;
+	paraD["r"]                = 0.5;
+
+	// default: absolut_tolerance_for_minimization=1.0e-1, relative_tolerance_for_minimization=1.0e-7, tolerance_for_HiggsMassSquared=1.0e-5
+	paraD["absolut_tolerance_for_minimization"]  =1.0e-7;
+	paraD["relative_tolerance_for_minimization"] =1.0e-7;
+	paraD["tolerance_for_HiggsMassSquared"]      =1.0e-5;
+
+	//default 100 each
+	paraI["max_numer_of_iterations_minimizer"]        = 100;
+	paraI["max_numer_of_iterations_HiggsMassSquared"] = 100;
+		
+	// 1 gsl_min_fminimizer_goldensection, 2 gsl_min_fminimizer_brent, 3 gsl_min_fminimizer_quad_golden
+	paraI["minimization_algorithm"] = 0;
+
+	paraD["testvalue_min"]              = 0.0; 
+	paraD["testvalue_max"]              = 0.0; 
+	paraD["testvalue_step"]             = 0.0;
+
+	paraS["outputfile"]             ="";
+	
+	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+	for( std::map< std::string, int >::const_iterator iter=paraI.begin(); iter!=paraI.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+	for( std::map< std::string, std::string >::const_iterator iter=paraS.begin(); iter!=paraS.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+}//prepareParameterMaps_plotPotential
+
+
+
+
+
+
 bool CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, const std::string &fileName )
 {
 	std::ifstream inputFile(fileName.c_str());
@@ -366,6 +439,98 @@ bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters( std::map< std::
 
 
 
+bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters_plotPotential( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+{
+	//extend related
+	if(!(paraIsSet["L_s"] && paraIsSet["L_t"]) || paraI["L_s"]<=0 || paraI["L_t"]<=0)
+	{
+		std::cerr <<"Error, no or non-positive lattice extends given" <<std::endl;
+		return false;
+	}
+	if(paraI["L_s"]%2!=0 || paraI["L_t"]%2!=0)
+	{
+		std::cerr <<"Error, only even lattice extend allowed" <<std::endl;
+		return false;
+	}
+	if(!paraIsSet["antiperiodic_L_t"])
+	{
+		std::cerr <<"Error, antiperiodic_L_t is not specified" <<std::endl;
+		return false;
+	}
+	//m0Squared (only if not use_kappa is set)
+	if( !paraI["use_kappa"] && !paraIsSet["scan_m0Squared"] )
+	{
+		std::cerr <<"Error, no m0Squared given" <<std::endl;
+		return false;
+	}
+	//
+	if( paraI["use_kappa"] && !paraIsSet["kappa"])
+	{
+		std::cerr <<"Error, no kappa given" <<std::endl;
+		return false;
+	}
+	//lambda
+	if( !paraIsSet["lambda"] )
+	{
+		std::cerr <<"Error, no lambda given" <<std::endl;
+		return false;
+	}
+	//lambda_6
+	if( !paraIsSet["lambda_6"] )
+	{
+		std::cerr <<"Error, no lambda_6 given" <<std::endl;
+		return false;
+	}
+	//yukawa_t
+	if( !paraIsSet["yukawa_t"] )
+	{
+		std::cerr <<"Error, no yukawa_t given" <<std::endl;
+		return false;
+	}
+	//yukawa_ratio
+	if( !paraIsSet["yukawa_ratio"] )
+	{
+		std::cerr <<"Error, no yukawa_ratio given" <<std::endl;
+		return false;
+	}
+	//testvalue
+	if(!(paraIsSet["testvalue_min"] && paraIsSet["testvalue_max"] && paraIsSet["testvalue_step"]))
+	{
+		std::cerr <<"Error, no scan range for testvalue given" <<std::endl;
+		return false;
+	}
+	if( paraD["testvalue_max"] < paraD["testvalue_min"] || paraD["testvalue_step"] <=0.0 )
+	{
+		std::cerr <<"Error, inconsistent scan range in testvalue" <<std::endl;
+		return false;
+	}
+	//field
+	if(!(paraIsSet["field_min"] && paraIsSet["field_max"] && paraIsSet["field_step"]))
+	{
+		std::cerr <<"Error, no scan range for field given" <<std::endl;
+		return false;
+	}
+	if( paraD["field_max"] < paraD["field_min"] || paraD["field_step"] <=0.0 )
+	{
+		std::cerr <<"Error, inconsistent scan range in field" <<std::endl;
+		return false;
+	}
+	//listOfFermContr
+	if( paraIsSet["use_listOfFermContr"] && paraI["use_listOfFermContr"] )
+	{
+		if( !paraIsSet["listOfFermContr"] || paraS["listOfFermContr"].compare("")==0  )
+		{
+			std::cerr <<"Error, no listOfFermContr given!" <<std::endl;
+			return false;
+		}
+	}
+	return true;
+}//checkConsistencyOfParameters_plotPotential
+
+
+
+
+
 void CEPscan_inBrokenPhase_helper::fillSetWithRange( const double min, const double max, const double step, std::set< double > &toFill)
 {
 	toFill.clear();
@@ -500,11 +665,88 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 		outputFileName.replace(outputFileName.find("[yr]"),4, ss.str() );
 	}
 	return outputFileName;
-}
+}//generate_outputFileName
 	
 	
 	
 	
-	
-
+std::string CEPscan_inBrokenPhase_helper::generate_outputFileName_plotPotential(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet )
+{
+	//replaces placeholders in the filename
+	// [Ls]->Lxx, [Lt]->Txx, [m0Sq_k]->m0Sq_xxx_xxx or k_xxx_xxx, [l]->l_xxx_xxx ->[l6]->l6_xxx_xxx
+	// [yt]->yt_xxx_xxx
+	std::string outputFileName(baseName);
+	if( outputFileName.find("[Ls]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"L" <<paraI["L_s"];
+		outputFileName.replace(outputFileName.find("[Ls]"),4, ss.str() );
+	}
+	if( outputFileName.find("[Lt]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"T" <<paraI["L_t"];
+		outputFileName.replace(outputFileName.find("[Lt]"),4, ss.str() );
+	}
+	if( outputFileName.find("[m0Sq_k]")!=std::string::npos )
+	{
+		if(paraIsSet["use_kappa"] && paraI["use_kappa"])
+		{
+			std::ostringstream ss;
+			ss <<"k_";
+			ss.precision(10);
+			ss <<paraD["kappa"];
+			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
+		}
+		else
+		{
+			std::ostringstream ss;
+			ss <<"m0Sq_";
+			ss.precision(10);
+			ss <<paraD["m0Squared"];
+			outputFileName.replace(outputFileName.find("[m0Sq_k]"),8, ss.str() );
+		}
+	}
+	if( outputFileName.find("[l]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"l_";
+		ss.precision(7);
+		ss <<paraD["lambda"];
+		outputFileName.replace(outputFileName.find("[l]"),3, ss.str() );
+	}
+	if( outputFileName.find("[l6]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"l6_";
+		ss.precision(7);
+		ss <<paraD["lambda_6"];
+		outputFileName.replace(outputFileName.find("[l6]"),4, ss.str() );
+	}
+	if( outputFileName.find("[yt]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"yt_";
+		ss.precision(7);
+		ss <<paraD["yukawa_t"];
+		outputFileName.replace(outputFileName.find("[yt]"),4, ss.str() );
+	}
+	if( outputFileName.find("[yr]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"yr_";
+		ss.precision(7);
+		ss <<paraD["yukawa_ratio"];
+		outputFileName.replace(outputFileName.find("[yr]"),4, ss.str() );
+	}
+	if( outputFileName.find("[field]")!=std::string::npos )
+	{
+		std::ostringstream ss;
+		ss <<"scan_";
+		ss.precision(7);
+		ss <<paraD["field_min"] <<"_" <<paraD["field_max"];
+		outputFileName.replace(outputFileName.find("[field]"),7, ss.str() );
+	}
+	return outputFileName;
+}//generate_outputFileName_plotPotential
 

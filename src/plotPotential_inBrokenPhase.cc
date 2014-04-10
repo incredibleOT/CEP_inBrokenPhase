@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "constrainedEffectivePotential_inBrokenPhase.h"
-#include "plotPotential_inBrokenPhase_helper.h"
+#include "CEPscan_inBrokenPhase_helper.h"
 
 using std::cout;
 using std::cerr;
@@ -24,7 +24,7 @@ int main(int narg,char **arg)
 	std::map< std::string, std::string > parametersString;
 	std::map< std::string, bool > parametersIsSet;
 	
-	plotPotential_inBrokenPhase_helper::prepareParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet);
+	CEPscan_inBrokenPhase_helper::prepareParameterMaps_plotPotential(parametersDouble, parametersInt, parametersString, parametersIsSet);
 	size_t numberOfParameters=parametersDouble.size()+parametersInt.size()+parametersString.size();
 	
 	if(narg!=2)
@@ -34,17 +34,17 @@ int main(int narg,char **arg)
 		exit(EXIT_FAILURE);
 	}
 	
-	if( !plotPotential_inBrokenPhase_helper::loadParameterMapsFromFile(parametersDouble, parametersInt, parametersString, parametersIsSet, arg[1]) )
+	if( !CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile(parametersDouble, parametersInt, parametersString, parametersIsSet, arg[1]) )
 	{
 		cerr <<"Error loading input file" <<endl <<arg[1] <<endl;
 		exit(EXIT_FAILURE);
 	}
 	
 	cout <<endl <<"Parameters loaded:" <<endl;
-	plotPotential_inBrokenPhase_helper::streamSetParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet,cout);
+	CEPscan_inBrokenPhase_helper::streamSetParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet,cout);
 	
 	cout <<endl <<"Check consistency of parameters" <<endl;
-	if(!(plotPotential_inBrokenPhase_helper::checkConsistencyOfParameters(parametersDouble, parametersInt, parametersString, parametersIsSet)))
+	if(!(CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters_plotPotential(parametersDouble, parametersInt, parametersString, parametersIsSet)))
 	{
 		cerr <<"Failed! Some parameters are inconsistent!" <<endl;
 		exit(EXIT_FAILURE);
@@ -112,6 +112,16 @@ int main(int narg,char **arg)
 		CEP.set_m0Squared( parametersDouble["m0Squared"] );
 	}
 	
+	
+	//the following is for the case of periodic solutions (i.e. arriving at a mass during the iteration where we were already)
+	std::map< int, double > HiggsMassesSquared; //<counter, HiggsMasses>, to test for periodic solutions
+	std::map< int, double > minima; //<counter, minimum>, to test for periodic solutions
+	bool periodic_solution(false);
+	const double accuracy_for_periodicity=1.0e-12;//when two masses are assumed to be equal
+	const double maximal_spread_for_periodicity=5.0e-3; //if spread for periodicity is too large, its not an artifact but maybe a fluctuation between two minima
+	double av_massSquared=0.0;
+	double av_minimum=0.0;
+	
 	//determine higgsmass
 	int counter=0;
 	bool toContinue(true);
@@ -122,6 +132,7 @@ int main(int narg,char **arg)
 		++counter;
 		if(counter==1){ CEP.set_HigsMassSquared(0.000001); }
 		else{ CEP.set_HigsMassSquared( new_HiggsMassSquared ); }
+		HiggsMassesSquared.insert( std::make_pair( counter, CEP.get_actual_HiggsMassSquared() ) );
 		double min(0.0), lower(0.0), upper(0.0);
 		CEP.determine_startingPoints(parametersDouble["testvalue_min"], parametersDouble["testvalue_max"], parametersDouble["testvalue_step"], min, lower, upper);
 		if(lower==upper)
@@ -175,11 +186,64 @@ int main(int narg,char **arg)
 			new_HiggsMassSquared=CEP.compute_CEP_inBrokenPhase_secondDerivative(CEP.get_actual_minimum());
 			cout <<"minimum: " <<CEP.get_actual_minimum() <<" (" <<n_of_iter <<" iter.)";
 			cout <<"  newMassSquared: " <<new_HiggsMassSquared <<endl;
+			minima.insert( std::make_pair( counter, CEP.get_actual_minimum() ) );
 			if( std::abs( 2.0*(new_HiggsMassSquared - old_HiggsMassSquared)/(old_HiggsMassSquared + new_HiggsMassSquared)) <parametersDouble["tolerance_for_HiggsMassSquared"] )
 			{
 				cout <<"Mass determination converged after " <<counter <<" iterations" ;
 				cout <<"   minimum: " <<CEP.get_actual_minimum() <<"  mHSquared: " <<new_HiggsMassSquared <<endl;
 				toContinue=false;
+			}
+			//check for periodic solution
+			std::map< int, double >::iterator closest=CEPscan_inBrokenPhase_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
+			if( std::abs( 2.0*( closest->second - new_HiggsMassSquared)/(closest->second + new_HiggsMassSquared)) < accuracy_for_periodicity )
+			{
+				int period=counter+1-closest->first;
+				cout <<"Periodic solution found! Period=" <<period <<endl;
+				//for determin spread of mSquared and minimum
+				double largest_mSquared=closest->second;
+				double smallest_mSquared=closest->second;
+				double largest_minimum= (minima.find(closest->first)!=minima.end()) ? ((minima.find(closest->first)->second)):-1.0;
+				double smallest_minimum=largest_minimum;
+				
+				av_massSquared=0.0;
+				av_minimum=0.0;
+				while(closest != HiggsMassesSquared.end())
+				{
+					av_massSquared+=closest->second;
+					std::map< int, double >::iterator minIter=minima.find(closest->first);
+					if(minIter==minima.end())
+					{
+						cerr<<"Error, there is no corresponding minimum. Skip value" <<endl;
+						skipValue=true;
+						toContinue=false;
+						break;
+					}
+					av_minimum+=minIter->second;
+					if(closest->second < smallest_mSquared){ smallest_mSquared=closest->second; }
+					if(closest->second > largest_mSquared){ largest_mSquared=closest->second; }
+					if(minIter->second < smallest_minimum){ smallest_minimum=minIter->second; }
+					if(minIter->second > largest_minimum){ largest_minimum=minIter->second; }
+					++closest;
+// 										cout <<"av=" <<av <<endl;
+				}
+				//if spread is too large, ignore values
+				if(   (0.5*(largest_mSquared-smallest_mSquared)/(largest_mSquared+smallest_mSquared) > maximal_spread_for_periodicity)   ||    (0.5*(largest_minimum-smallest_minimum)/(largest_minimum+smallest_minimum) > maximal_spread_for_periodicity)    )
+				{
+					cout <<"Spread of values during period too large, skip value" <<endl;
+					skipValue=true;
+					toContinue=false;
+				}
+				else
+				{
+					cout <<"take average of values" <<endl;
+					av_massSquared/=static_cast< double >(period);
+					av_minimum/=static_cast< double >(period);
+					toContinue=false;
+					periodic_solution=true;
+					cout <<"Mass determination converged after " <<counter <<" iterations" ;
+					cout <<"   minimum: " <<av_minimum <<"  mHSquared: " <<av_massSquared <<endl;
+				}
+				
 			}
 			if(counter==parametersInt["max_numer_of_iterations_HiggsMassSquared"])
 			{
@@ -195,9 +259,18 @@ int main(int narg,char **arg)
 		cerr <<"Problems occured during mass determination" <<endl;
 		exit(EXIT_FAILURE);
 	}
+// 	do not compile
+	//NOTE
+// 	deal with the case of periodic solutions
+	//set higgs mass zo the average if a periodic solution was found
+	if(periodic_solution)
+	{
+		CEP.set_HigsMassSquared(av_massSquared);
+	}
+	
 	
 	std::set< double > field;
-	plotPotential_inBrokenPhase_helper::fillSetWithRange( parametersDouble["field_min"], parametersDouble["field_max"], parametersDouble["field_step"], field);
+	CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["field_min"], parametersDouble["field_max"], parametersDouble["field_step"], field);
 	
 	//stores <field, potential>
 	std::map< double, double > result;
@@ -210,7 +283,7 @@ int main(int narg,char **arg)
 	
 	if(parametersIsSet["outputfile"])
 	{
-		std::string outputFileName( plotPotential_inBrokenPhase_helper::generate_outputFileName( parametersString["outputfile"], parametersDouble, parametersInt, parametersIsSet) );
+		std::string outputFileName( CEPscan_inBrokenPhase_helper::generate_outputFileName_plotPotential( parametersString["outputfile"], parametersDouble, parametersInt, parametersIsSet) );
 		
 		cout <<"print output to: " <<outputFileName <<endl;
 		
@@ -225,7 +298,7 @@ int main(int narg,char **arg)
 			outputFile.precision(14);
 			outputFile <<"# Output of plotPotential_inBrokenPhase" <<endl;
 			outputFile <<"# parameters set:" <<endl;
-			plotPotential_inBrokenPhase_helper::streamSetParameterMaps( parametersDouble, parametersInt, parametersString, parametersIsSet, outputFile, "#");
+			CEPscan_inBrokenPhase_helper::streamSetParameterMaps( parametersDouble, parametersInt, parametersString, parametersIsSet, outputFile, "#");
 			outputFile <<"# Location of minimum: " <<CEP.get_actual_minimum() <<endl;
 			outputFile <<"# curvature at minimum: " <<CEP.get_actual_HiggsMassSquared() <<endl;
 			outputFile <<"# Output format is:" <<endl;

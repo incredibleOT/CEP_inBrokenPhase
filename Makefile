@@ -13,8 +13,8 @@ CXXFLAGS= -Wall -Wextra -Wno-long-long -pedantic -O2
 #          ./speedTest_CEP_inBrokenPhase.o  
 
 LIBOFILES = ./src/constrainedEffectivePotential_inBrokenPhase.o \
-            ./src/CEPscan_inBrokenPhase_helper.o  \
-            ./src/plotPotential_inBrokenPhase_helper.o
+            ./src/CEPscan_inBrokenPhase_helper.o 
+#             ./src/plotPotential_inBrokenPhase_helper.o
 
 
 INCL=-I/opt/products/gsl/1.15/include
@@ -27,18 +27,18 @@ LIBS= -lgsl -lgslcblas -lm -static
 # ##########################################
 ###   mainprogs   ###
 
-CEPscan_inBrokenPhase: ./src/CEPscan_inBrokenPhase.o ${LIBOFILES}
+CEPscan_inBrokenPhase: ./src/CEPscan_inBrokenPhase.o ${LIBOFILES} 
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
 
 
-plotPotential_inBrokenPhase: ./src/plotPotential_inBrokenPhase.o ${LIBOFILES} ./src/plotPotential_inBrokenPhase_helper.o
+plotPotential_inBrokenPhase: ./src/plotPotential_inBrokenPhase.o ${LIBOFILES} ./src/CEPscan_inBrokenPhase_helper.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
 
 
 test_CEP_inBrokenPhase: ./src/test_CEP_inBrokenPhase.o ${LIBOFILES}
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
 
-speedTest_CEP_inBrokenPhase: ./src/speedTest_CEP_inBrokenPhase.o ${LIBOFILES}
+speedTest_CEP_inBrokenPhase: ./src/speedTest_CEP_inBrokenPhase.o ${LIBOFILES} 
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}
 
 generate_list_of_fermionic_contribution: ./src/generate_list_of_fermionic_contribution.o ${LIBOFILES}
@@ -46,6 +46,8 @@ generate_list_of_fermionic_contribution: ./src/generate_list_of_fermionic_contri
 
 ###########################################3
 ###   OFILES   ###
+
+./src/speedTest_CEP_inBrokenPhase.o: ./src/speedTest_CEP_inBrokenPhase.cc
 
 src/%.o:
 	cd src; make $(@F); cd ..

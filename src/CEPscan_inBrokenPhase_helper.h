@@ -15,7 +15,13 @@
 
 namespace CEPscan_inBrokenPhase_helper
 {
+	
+	//prepares the parameterMaps for CEPscan_inBrokenPhase
 	void prepareParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
+	
+	//prepares the parameterMaps for plotPotential_inBrokenPhase
+	void prepareParameterMaps_plotPotential( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
+	
 	
 	bool loadParameterMapsFromFile( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, const std::string &fileName );
 	
@@ -24,6 +30,9 @@ namespace CEPscan_inBrokenPhase_helper
 	void streamParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::ostream &output, const std::string &prefix = "");
 	
 	bool checkConsistencyOfParameters( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
+	
+	bool checkConsistencyOfParameters_plotPotential( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
+	
 	
 	void fillSetWithRange( const double min, const double max, const double step, std::set< double > &toFill );
 	
@@ -45,6 +54,8 @@ namespace CEPscan_inBrokenPhase_helper
 	std::map< int, double >::iterator findClosestMass( std::map< int, double > &HiggsMassesSquared, double value );
 	
 	std::string generate_outputFileName(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet );
+	
+	std::string generate_outputFileName_plotPotential(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet );
 	
 }
 
