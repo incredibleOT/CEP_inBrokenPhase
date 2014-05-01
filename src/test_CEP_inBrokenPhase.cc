@@ -8,8 +8,8 @@ using std::endl;
 
 int main()
 {
-// 	int L0(6), L1(6), L2(6), L3(6);
-	int L0(32), L1(32), L2(32), L3(64);
+	int L0(4), L1(6), L2(8), L3(10);
+// 	int L0(32), L1(32), L2(32), L3(64);
 	bool anti(false);
 	double y_t(175.0/246.0);
 // 	double y_t(0.75);
@@ -30,87 +30,88 @@ int main()
 // 	CEP.set_HigsMassSquared(HiggsMassSquared);
 
 	//load List of fermionic contributions:
-	std::string listOfContr("ListOfFermionicContributions/mt175_L32T64/CEP_fermCont_mt175_L32T64_v_0.0000001_1.2_0.0000001.txt");
+// 	std::string listOfContr("ListOfFermionicContributions/mt175_L32T64/CEP_fermCont_mt175_L32T64_v_0.0000001_1.2_0.0000001.txt");
 // 	CEP.load_fermionicContribution
-	cout <<"load list of fermionic contributions" <<endl;
-	
-	if(CEP.load_fermionicContribution( listOfContr ))
-	{
-		cout <<"Success" <<endl;
-	}
-	else
-	{
-		cout <<"No success" <<endl;
-	}
-
-
-
-
-	cout.precision(15);
-	cout <<"actual mHSquared: " <<CEP.get_actual_HiggsMassSquared() <<endl;
-	cout <<"propsum(0.0): " <<CEP.compute_propagatorSum(0.0) <<endl;
-	cout <<"propsum(mHSquared): " <<CEP.compute_propagatorSum(CEP.get_actual_HiggsMassSquared()) <<endl;
-	double mag=0.1;
-	cout <<"tree: " <<CEP.compute_treeLevel(mag) <<endl;
-	cout <<"ferm: " <<CEP.compute_fermionicContribution(mag) <<endl;
-	cout <<"1st:  " <<CEP.compute_firstOrderInLambdas(mag) <<endl;
-	cout <<"full: " <<CEP.compute_CEP_inBrokenPhase(mag) <<endl;
-	cout <<"full second derivative at: " <<CEP.compute_CEP_inBrokenPhase_secondDerivative(mag) <<endl;
-	
-	double inLower(0.01), inUpper(5.01), inStep(0.1), minimum(0.0), lower(0.0), upper(0.0);
-	CEP.determine_startingPoints(inLower, inUpper, inStep, minimum, lower, upper);
-	cout <<"result of first scan: minimum at: " <<minimum <<"   lower end: " <<lower <<"   upper end: " <<upper <<endl;
-	CEP.set_minimizationAlgorithm(2);
-	if( CEP.initialize_minimizer(minimum, lower, upper) )
-	{
-		cout <<"minimizer initiallized successfully" <<endl;
-	}
-// 	for(int i=1; i<150; ++i)
+	exit(0);
+// 	cout <<"load list of fermionic contributions" <<endl;
+// 	
+// 	if(CEP.load_fermionicContribution( listOfContr ))
 // 	{
-// 		int iterOutput=CEP.iterate_minimizer();
-// 		double min(0.0), low(0.0), up(0.0);
-// 		CEP.get_actual_Interval(min,low,up);
-// 		cout <<"iteration " <<i <<"   actual minimum at: " <<min <<"   lower: " <<low <<"   upper: " <<up <<"    status: " <<iterOutput 
-// 		     <<"   converged: " <<CEP.check_convergence() <<endl;
+// 		cout <<"Success" <<endl;
 // 	}
-	
-	
-	//
-	
-	
-	
-	
-	bool toContinue(true);
-	double limitForHiggsMass(1.0e-5);
-	int counter(0), maxCounter(100);
-	while(toContinue)
-	{
-		++counter;
-		double oldHiggsMassSquared=CEP.get_actual_HiggsMassSquared();
-		int numberOfIteration(0);
-// 		cout <<"HiggsMassSquared before iteration: " <<oldHiggsMassSquared <<endl;
-		numberOfIteration=CEP.iterate_minimizer_until_convergence();
-		cout <<"Convergence reached after " <<numberOfIteration <<" iterations.   Minimum at " <<CEP.get_actual_minimum() <<endl;
-		double newHiggsMassSquared=CEP.compute_CEP_inBrokenPhase_secondDerivative(CEP.get_actual_minimum());
-		cout <<"HiggsMassSquared after iteration: " <<newHiggsMassSquared <<endl;
-		if( std::abs( 2.0*(newHiggsMassSquared - oldHiggsMassSquared)/(oldHiggsMassSquared + newHiggsMassSquared)) <limitForHiggsMass )
-		{
-			toContinue=false;
-			cout <<"Higgs mass determination converged after " <<counter << " iterations" <<endl;
-			cout <<"Final values:" <<endl;
-			cout <<"minimum at : " <<CEP.get_actual_minimum() <<"   corresponding to cutoff of " <<246.0/CEP.get_actual_minimum() <<" GeV" <<endl;
-			cout <<"HiggsMassSquared: " <<newHiggsMassSquared <<"   corresponding to mass of "
-			     <<sqrt(newHiggsMassSquared)*246.0/CEP.get_actual_minimum() <<" GeV" <<endl;
-		}
-		if( counter== maxCounter )
-		{
-			cout <<"No convergence after " <<maxCounter <<" iterations" <<endl;
-			break;
-		}
-		CEP.set_HigsMassSquared(newHiggsMassSquared);
-		CEP.determine_startingPoints(inLower, inUpper, inStep, minimum, lower, upper);
-		CEP.reInitialize_minimizer(minimum, lower, upper);
-	}
+// 	else
+// 	{
+// 		cout <<"No success" <<endl;
+// 	}
+// 
+// 
+// 
+// 
+// 	cout.precision(15);
+// 	cout <<"actual mHSquared: " <<CEP.get_actual_HiggsMassSquared() <<endl;
+// 	cout <<"propsum(0.0): " <<CEP.compute_propagatorSum(0.0) <<endl;
+// 	cout <<"propsum(mHSquared): " <<CEP.compute_propagatorSum(CEP.get_actual_HiggsMassSquared()) <<endl;
+// 	double mag=0.1;
+// 	cout <<"tree: " <<CEP.compute_treeLevel(mag) <<endl;
+// 	cout <<"ferm: " <<CEP.compute_fermionicContribution(mag) <<endl;
+// 	cout <<"1st:  " <<CEP.compute_firstOrderInLambdas(mag) <<endl;
+// 	cout <<"full: " <<CEP.compute_CEP_inBrokenPhase(mag) <<endl;
+// 	cout <<"full second derivative at: " <<CEP.compute_CEP_inBrokenPhase_secondDerivative(mag) <<endl;
+// 	
+// 	double inLower(0.01), inUpper(5.01), inStep(0.1), minimum(0.0), lower(0.0), upper(0.0);
+// 	CEP.determine_startingPoints(inLower, inUpper, inStep, minimum, lower, upper);
+// 	cout <<"result of first scan: minimum at: " <<minimum <<"   lower end: " <<lower <<"   upper end: " <<upper <<endl;
+// 	CEP.set_minimizationAlgorithm(2);
+// 	if( CEP.initialize_minimizer(minimum, lower, upper) )
+// 	{
+// 		cout <<"minimizer initiallized successfully" <<endl;
+// 	}
+// // 	for(int i=1; i<150; ++i)
+// // 	{
+// // 		int iterOutput=CEP.iterate_minimizer();
+// // 		double min(0.0), low(0.0), up(0.0);
+// // 		CEP.get_actual_Interval(min,low,up);
+// // 		cout <<"iteration " <<i <<"   actual minimum at: " <<min <<"   lower: " <<low <<"   upper: " <<up <<"    status: " <<iterOutput 
+// // 		     <<"   converged: " <<CEP.check_convergence() <<endl;
+// // 	}
+// 	
+// 	
+// 	//
+// 	
+// 	
+// 	
+// 	
+// 	bool toContinue(true);
+// 	double limitForHiggsMass(1.0e-5);
+// 	int counter(0), maxCounter(100);
+// 	while(toContinue)
+// 	{
+// 		++counter;
+// 		double oldHiggsMassSquared=CEP.get_actual_HiggsMassSquared();
+// 		int numberOfIteration(0);
+// // 		cout <<"HiggsMassSquared before iteration: " <<oldHiggsMassSquared <<endl;
+// 		numberOfIteration=CEP.iterate_minimizer_until_convergence();
+// 		cout <<"Convergence reached after " <<numberOfIteration <<" iterations.   Minimum at " <<CEP.get_actual_minimum() <<endl;
+// 		double newHiggsMassSquared=CEP.compute_CEP_inBrokenPhase_secondDerivative(CEP.get_actual_minimum());
+// 		cout <<"HiggsMassSquared after iteration: " <<newHiggsMassSquared <<endl;
+// 		if( std::abs( 2.0*(newHiggsMassSquared - oldHiggsMassSquared)/(oldHiggsMassSquared + newHiggsMassSquared)) <limitForHiggsMass )
+// 		{
+// 			toContinue=false;
+// 			cout <<"Higgs mass determination converged after " <<counter << " iterations" <<endl;
+// 			cout <<"Final values:" <<endl;
+// 			cout <<"minimum at : " <<CEP.get_actual_minimum() <<"   corresponding to cutoff of " <<246.0/CEP.get_actual_minimum() <<" GeV" <<endl;
+// 			cout <<"HiggsMassSquared: " <<newHiggsMassSquared <<"   corresponding to mass of "
+// 			     <<sqrt(newHiggsMassSquared)*246.0/CEP.get_actual_minimum() <<" GeV" <<endl;
+// 		}
+// 		if( counter== maxCounter )
+// 		{
+// 			cout <<"No convergence after " <<maxCounter <<" iterations" <<endl;
+// 			break;
+// 		}
+// 		CEP.set_HigsMassSquared(newHiggsMassSquared);
+// 		CEP.determine_startingPoints(inLower, inUpper, inStep, minimum, lower, upper);
+// 		CEP.reInitialize_minimizer(minimum, lower, upper);
+// 	}
 	
 	
 }

@@ -458,7 +458,7 @@ bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters_plotPotential( s
 		return false;
 	}
 	//m0Squared (only if not use_kappa is set)
-	if( !paraI["use_kappa"] && !paraIsSet["scan_m0Squared"] )
+	if( !paraI["use_kappa"] && !paraIsSet["m0Squared"] )
 	{
 		std::cerr <<"Error, no m0Squared given" <<std::endl;
 		return false;
