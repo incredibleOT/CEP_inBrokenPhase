@@ -1,4 +1,6 @@
 This Program should determin the "phase structure" from the CEP, while still assuming to be in the broken phase.
+using the potential in chapter 9 of the notes
+
 
 The prrinciple is the following:
 
@@ -12,3 +14,6 @@ The prrinciple is the following:
  	- set mass in propagator sum
    }
    until the minimum is stable
+   
+Another ansatz is , while still assuming to be in the broken phase to take a larger part from the interaction into account when doing the 
+gaussian integration using the potential given in chapter 10 of the notes

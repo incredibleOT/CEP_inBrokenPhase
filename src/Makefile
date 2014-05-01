@@ -24,6 +24,9 @@ CEPscan_inBrokenPhase_helper.o: CEPscan_inBrokenPhase_helper.cc \
                                 CEPscan_inBrokenPhase_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
+CEP_withFullBosDet.o: CEP_withFullBosDet.cc \
+                      CEP_withFullBosDet.h
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 ###########################################
 ##for executables
 CEPscan_inBrokenPhase.o: CEPscan_inBrokenPhase.cc \
@@ -48,6 +51,9 @@ plotPotential_inBrokenPhase.o: plotPotential_inBrokenPhase.cc \
                                CEPscan_inBrokenPhase_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
+example_minimizer_CEP_withFullBosDet.o: example_minimizer_CEP_withFullBosDet.cc \
+                                        CEP_withFullBosDet.h
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 clean:
 	rm *.o
