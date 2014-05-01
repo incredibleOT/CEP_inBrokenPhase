@@ -30,7 +30,7 @@ The prrinciple is the following:
 #include "gsl/gsl_errno.h"
 #include "gsl/gsl_min.h"
 
-class constrainedEffectivePotential_inBrokenPhase
+class CEP_inBrokenPhase
 {
 	private:
 	//physical parameters
@@ -89,8 +89,8 @@ class constrainedEffectivePotential_inBrokenPhase
 	public:
 	
 	//constructor and destructor
-	constrainedEffectivePotential_inBrokenPhase(int l0, int l1, int l2, int l3, bool anti);
-	~constrainedEffectivePotential_inBrokenPhase();
+	CEP_inBrokenPhase(int l0, int l1, int l2, int l3, bool anti);
+	~CEP_inBrokenPhase();
 	
 	//set parameters
 	void set_m0Squared( double new_m0Squared );

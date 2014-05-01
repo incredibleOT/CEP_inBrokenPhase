@@ -1,8 +1,8 @@
-#include "constrainedEffectivePotential_inBrokenPhase.h"
+#include "CEP_inBrokenPhase.h"
 
 
 //constructor
-constrainedEffectivePotential_inBrokenPhase::constrainedEffectivePotential_inBrokenPhase(int l0, int l1, int l2, int l3, bool anti):
+CEP_inBrokenPhase::CEP_inBrokenPhase(int l0, int l1, int l2, int l3, bool anti):
 L0(l0), L1(l1), L2(l2), L3(l3), antiperiodicBC_L3(anti),
 m0Squared(0.0), yukawa_t(0.0), yukawa_b(0.0), lambda(0.0), lambda_6(0.0), N_f(1),ignore_goldstone_modes(false),
 rho(1.0), one_ov_two_rho(0.5), r(0.5),
@@ -24,7 +24,7 @@ fermionicContributions_are_valid(false)
 
 
 //destructor
-constrainedEffectivePotential_inBrokenPhase::~constrainedEffectivePotential_inBrokenPhase()
+CEP_inBrokenPhase::~CEP_inBrokenPhase()
 {
 	delete [] eigenvalues_of_overlap;
 	delete [] factor_for_eigenvalues;
@@ -35,11 +35,11 @@ constrainedEffectivePotential_inBrokenPhase::~constrainedEffectivePotential_inBr
 
 
 //setting parameters
-void constrainedEffectivePotential_inBrokenPhase::set_m0Squared( double new_m0Squared )
+void CEP_inBrokenPhase::set_m0Squared( double new_m0Squared )
 { 
 	if( m0Squared != new_m0Squared ){ m0Squared=new_m0Squared; reinitialize(); } 
 }
-void constrainedEffectivePotential_inBrokenPhase::set_yukawas( double y_t, double y_b )
+void CEP_inBrokenPhase::set_yukawas( double y_t, double y_b )
 { 
 	if( yukawa_t != y_t || yukawa_b != y_b )
 	{ 
@@ -52,22 +52,22 @@ void constrainedEffectivePotential_inBrokenPhase::set_yukawas( double y_t, doubl
 	
 	reinitialize();
 }
-void constrainedEffectivePotential_inBrokenPhase::set_lambda( double new_lambda ){ if(lambda != new_lambda){ lambda = new_lambda; reinitialize(); } }
-void constrainedEffectivePotential_inBrokenPhase::set_lambda_6( double new_lambda_6 ){ if(lambda_6 != new_lambda_6 ){ lambda_6=new_lambda_6; reinitialize(); } }
-void constrainedEffectivePotential_inBrokenPhase::set_N_f( int new_N_f){ if(N_f != new_N_f){ N_f=new_N_f; reinitialize(); } }
+void CEP_inBrokenPhase::set_lambda( double new_lambda ){ if(lambda != new_lambda){ lambda = new_lambda; reinitialize(); } }
+void CEP_inBrokenPhase::set_lambda_6( double new_lambda_6 ){ if(lambda_6 != new_lambda_6 ){ lambda_6=new_lambda_6; reinitialize(); } }
+void CEP_inBrokenPhase::set_N_f( int new_N_f){ if(N_f != new_N_f){ N_f=new_N_f; reinitialize(); } }
 
-void constrainedEffectivePotential_inBrokenPhase::set_ignore_goldstone_modes(bool new_ignore){ ignore_goldstone_modes=new_ignore; }
+void CEP_inBrokenPhase::set_ignore_goldstone_modes(bool new_ignore){ ignore_goldstone_modes=new_ignore; }
 
-void constrainedEffectivePotential_inBrokenPhase::set_rho( double new_rho )
+void CEP_inBrokenPhase::set_rho( double new_rho )
 {
 	if(rho != new_rho){ rho=new_rho; one_ov_two_rho=0.5/rho; if(eigenvalues_of_overlap!=0){fill_eigenvaluesAndFactors(); } reinitialize(); }
 }
-void constrainedEffectivePotential_inBrokenPhase::set_r( double new_r)
+void CEP_inBrokenPhase::set_r( double new_r)
 {
 	if(r != new_r){ r=new_r; if(eigenvalues_of_overlap!=0){fill_eigenvaluesAndFactors(); } reinitialize(); }
 }
 
-void constrainedEffectivePotential_inBrokenPhase::init_HiggsMassSquared()
+void CEP_inBrokenPhase::init_HiggsMassSquared()
 {
 	actual_HiggsMassSquared=(m0Squared>=0)? m0Squared : 0.0;
 	if(actual_HiggsMassSquared==0.0){ propagatorSum_withHiggsMass=propagatorSum_withZeroMass; }
@@ -77,7 +77,7 @@ void constrainedEffectivePotential_inBrokenPhase::init_HiggsMassSquared()
 	}
 }
 
-void constrainedEffectivePotential_inBrokenPhase::set_HigsMassSquared( double mHSquared )
+void CEP_inBrokenPhase::set_HigsMassSquared( double mHSquared )
 {
 	if( mHSquared!=actual_HiggsMassSquared )
 	{
@@ -88,23 +88,23 @@ void constrainedEffectivePotential_inBrokenPhase::set_HigsMassSquared( double mH
 	
 	
 	
-void constrainedEffectivePotential_inBrokenPhase::reinitialize(){}
+void CEP_inBrokenPhase::reinitialize(){}
 
 
 //getting parameters
-double constrainedEffectivePotential_inBrokenPhase::get_m0Squared(){ return m0Squared; }
-double constrainedEffectivePotential_inBrokenPhase::get_yukawa_t(){ return yukawa_t; }
-double constrainedEffectivePotential_inBrokenPhase::get_yukawa_b(){ return yukawa_b; }
-double constrainedEffectivePotential_inBrokenPhase::get_lambda(){ return lambda; }
-double constrainedEffectivePotential_inBrokenPhase::get_lambda_6(){ return lambda_6;}
-int constrainedEffectivePotential_inBrokenPhase::get_N_f(){ return N_f; }
+double CEP_inBrokenPhase::get_m0Squared(){ return m0Squared; }
+double CEP_inBrokenPhase::get_yukawa_t(){ return yukawa_t; }
+double CEP_inBrokenPhase::get_yukawa_b(){ return yukawa_b; }
+double CEP_inBrokenPhase::get_lambda(){ return lambda; }
+double CEP_inBrokenPhase::get_lambda_6(){ return lambda_6;}
+int CEP_inBrokenPhase::get_N_f(){ return N_f; }
 
-double constrainedEffectivePotential_inBrokenPhase::get_rho(){ return rho; }
-double constrainedEffectivePotential_inBrokenPhase::get_r(){ return r; }
+double CEP_inBrokenPhase::get_rho(){ return rho; }
+double CEP_inBrokenPhase::get_r(){ return r; }
 
-double constrainedEffectivePotential_inBrokenPhase::get_actual_HiggsMassSquared(){ return actual_HiggsMassSquared; }
+double CEP_inBrokenPhase::get_actual_HiggsMassSquared(){ return actual_HiggsMassSquared; }
 
-std::complex< double > constrainedEffectivePotential_inBrokenPhase::computeAnalyticalEigenvalue(double p0, double p1, double p2, double p3)
+std::complex< double > CEP_inBrokenPhase::computeAnalyticalEigenvalue(double p0, double p1, double p2, double p3)
 {
 	//computes \nu^{+} from philipp's thesis (eq 3.9)
 	// \nu(p) = \rho/a + \rho/a * [i\sqrt{\tilde{p}^2} + a*r *\hat{p}^2 - \rho/a]/[\srqt{\tilde{p}^2 + (a*r *\hat{p}^2 - \rho/a)^2}]
@@ -130,7 +130,7 @@ std::complex< double > constrainedEffectivePotential_inBrokenPhase::computeAnaly
 
 
 
-void constrainedEffectivePotential_inBrokenPhase::fill_eigenvaluesAndFactors()
+void CEP_inBrokenPhase::fill_eigenvaluesAndFactors()
 {
 	//fills the arrays with the eigenvalues of the overlap operator and a corresponding verctor with the
 	//frequency of its occurence
@@ -643,7 +643,7 @@ void constrainedEffectivePotential_inBrokenPhase::fill_eigenvaluesAndFactors()
 
 
 
-void constrainedEffectivePotential_inBrokenPhase::fill_sinSquaredAndFactors()
+void CEP_inBrokenPhase::fill_sinSquaredAndFactors()
 {
 	//fills the arrays 4*sum_mu(sin(p_mu/2)^2) and the corresponding
 	//frequency of its occurence
@@ -1169,7 +1169,7 @@ void constrainedEffectivePotential_inBrokenPhase::fill_sinSquaredAndFactors()
 
 
 
-double constrainedEffectivePotential_inBrokenPhase::compute_propagatorSum( double massSquared )
+double CEP_inBrokenPhase::compute_propagatorSum( double massSquared )
 {
 	if( four_times_sum_of_sinSquared == 0 ){ fill_sinSquaredAndFactors() ; }; //should not happen...
 	double dummy(0.0);
@@ -1181,7 +1181,7 @@ double constrainedEffectivePotential_inBrokenPhase::compute_propagatorSum( doubl
 	return dummy;
 }
 
-double constrainedEffectivePotential_inBrokenPhase::compute_CEP_inBrokenPhase( double value )
+double CEP_inBrokenPhase::compute_CEP_inBrokenPhase( double value )
 {
 	//this function computes the constrained effective potential in the broken Phase:
 	// U(v) = U_tree + U_ferm + U_1st
@@ -1197,12 +1197,12 @@ double constrainedEffectivePotential_inBrokenPhase::compute_CEP_inBrokenPhase( d
 }
 
 
-double constrainedEffectivePotential_inBrokenPhase::compute_treeLevel( double value )
+double CEP_inBrokenPhase::compute_treeLevel( double value )
 {
 	return 0.5*m0Squared*value*value + lambda*value*value*value*value + lambda_6*value*value*value*value*value*value;
 }
 
-double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContribution( double value )
+double CEP_inBrokenPhase::compute_fermionicContribution( double value )
 {
 	// U_ferm(v) = -2*N_f/V * sum_p[ log ( z_t * z_t^* )  +  log ( z_b * z_b^* ) ]
 	//              z_t/b = nu  +  y_t/b * v * ( 1 - 1/(2 rho)*nu)  with nu being the eigenvalue of the overlap 
@@ -1241,7 +1241,7 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 // 	return (dummy);
 }
 
-double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas( double value )
+double CEP_inBrokenPhase::compute_firstOrderInLambdas( double value )
 {
 	// U_1st(v) = lambda * 6 * v^2 * ( P_G + P_H )  +  lambda_6 * ( v^2 * ( 45*P_G^2  +  54*P_G*P_H  +  45*P_H^2 )  +  v^4 * ( 9*P_G + 15*P_H ) )
 	if(  ignore_goldstone_modes  )
@@ -1260,7 +1260,7 @@ double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas(
 	}
 }
 
-double constrainedEffectivePotential_inBrokenPhase::compute_CEP_inBrokenPhase_secondDerivative( double value )
+double CEP_inBrokenPhase::compute_CEP_inBrokenPhase_secondDerivative( double value )
 {
 	//computes U''(v) = U_tree'' + U_ferm'' + U_1st''
 	// U_tree''(v) =  m0Squared  + 12*lambda * v^2  + 30*lambda_6 * v^4
@@ -1272,13 +1272,13 @@ double constrainedEffectivePotential_inBrokenPhase::compute_CEP_inBrokenPhase_se
 	return result;
 }
 	
-double constrainedEffectivePotential_inBrokenPhase::compute_treeLevel_secondDerivative( double value )
+double CEP_inBrokenPhase::compute_treeLevel_secondDerivative( double value )
 {
 	// U_tree''(v) =  m0Squared  + 12*lambda * v^2  + 30*lambda_6 * v^4
 	return m0Squared + 12.0*lambda*value*value + 30.0*lambda_6*value*value*value*value;
 }
 	
-double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContribution_secondDerivative( double value )
+double CEP_inBrokenPhase::compute_fermionicContribution_secondDerivative( double value )
 {
 	// U_ferm''(v) = U_fpp=sum_p{-2*y_t^2*Re[w^2/z_t^2]} + , sum_p{-2*y_b^2*Re[w^2/z_b^2]} with w = 1 - 1/(2 rho)*nu, z_t/b=(nu +  y_t/b * v *w)
 	if(eigenvalues_of_overlap==0){ fill_eigenvaluesAndFactors(); }
@@ -1300,7 +1300,7 @@ double constrainedEffectivePotential_inBrokenPhase::compute_fermionicContributio
 	return dummy;
 }
 
-double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas_secondDerivative( double value )
+double CEP_inBrokenPhase::compute_firstOrderInLambdas_secondDerivative( double value )
 {
 	// U_1st''(v) = lambda * 12 ( P_G + P_H )  +  lambda_6 * ( ( 90*P_G^2  +  108*P_G*P_H  +  90*P_H^2 )  +  v^2 * ( 108*P_G + 180*P_H ) )
 	if( ignore_goldstone_modes )
@@ -1319,7 +1319,7 @@ double constrainedEffectivePotential_inBrokenPhase::compute_firstOrderInLambdas_
 	}
 }
 
-bool constrainedEffectivePotential_inBrokenPhase::load_fermionicContribution( const std::string &fileName )
+bool CEP_inBrokenPhase::load_fermionicContribution( const std::string &fileName )
 {
 	fermionicContributions.clear();
 	fermionicContributions_are_valid=false;
@@ -1376,11 +1376,11 @@ bool constrainedEffectivePotential_inBrokenPhase::load_fermionicContribution( co
 
 
 
-void constrainedEffectivePotential_inBrokenPhase::set_max_numberOfIterations(int new_max){ max_numberOfIterations=new_max; }
-void constrainedEffectivePotential_inBrokenPhase::set_relative_Accuracy( double new_rel_acc){ relative_Accuracy=new_rel_acc; }
-void constrainedEffectivePotential_inBrokenPhase::set_absolute_Accuracy( double new_abs_acc){ absolute_Accuracy=new_abs_acc; }
+void CEP_inBrokenPhase::set_max_numberOfIterations(int new_max){ max_numberOfIterations=new_max; }
+void CEP_inBrokenPhase::set_relative_Accuracy( double new_rel_acc){ relative_Accuracy=new_rel_acc; }
+void CEP_inBrokenPhase::set_absolute_Accuracy( double new_abs_acc){ absolute_Accuracy=new_abs_acc; }
 
-void constrainedEffectivePotential_inBrokenPhase::set_minimizationAlgorithm( int new_algorithm )
+void CEP_inBrokenPhase::set_minimizationAlgorithm( int new_algorithm )
 {
 	// 1 - gsl_min_fminimizer_goldensection
 	// 2 - gsl_min_fminimizer_brent
@@ -1400,7 +1400,7 @@ void constrainedEffectivePotential_inBrokenPhase::set_minimizationAlgorithm( int
 			algorithmForMinimization = (gsl_min_fminimizer_quad_golden);
 			break;
 		default:
-			std::cerr <<"Error, algorithm " <<new_algorithm <<" is not valid in constrainedEffectivePotential_inBrokenPhase::set_minimizationAlgorithm(int new_alg) " <<std::endl;
+			std::cerr <<"Error, algorithm " <<new_algorithm <<" is not valid in CEP_inBrokenPhase::set_minimizationAlgorithm(int new_alg) " <<std::endl;
 			std::cerr <<"Use one of the following:" <<std::endl;
 			std::cerr <<"1 = gsl_min_fminimizer_goldensection" <<std::endl;
 			std::cerr <<"2 = gsl_min_fminimizer_brent" <<std::endl;
@@ -1409,7 +1409,7 @@ void constrainedEffectivePotential_inBrokenPhase::set_minimizationAlgorithm( int
 	}
 }
 
-bool constrainedEffectivePotential_inBrokenPhase::reInitialize_minimizer( double minimum, double lower, double upper )
+bool CEP_inBrokenPhase::reInitialize_minimizer( double minimum, double lower, double upper )
 {
 	if(!minimizerInitialized){ return false; }
 	int dummy( gsl_min_fminimizer_set( minimizer, &functionHandler, minimum, lower, upper ) );
@@ -1418,7 +1418,7 @@ bool constrainedEffectivePotential_inBrokenPhase::reInitialize_minimizer( double
 	return true;
 }
 
-bool constrainedEffectivePotential_inBrokenPhase::initialize_minimizer( double minimum, double lower, double upper )
+bool CEP_inBrokenPhase::initialize_minimizer( double minimum, double lower, double upper )
 {
 	if(minimizerInitialized){ return reInitialize_minimizer( minimum, lower, upper ); }
 	minimizer = gsl_min_fminimizer_alloc( algorithmForMinimization );
@@ -1433,19 +1433,19 @@ bool constrainedEffectivePotential_inBrokenPhase::initialize_minimizer( double m
 
 
 
-// int constrainedEffectivePotential_inBrokenPhase::determine_startingAndInitialize( double lower, double upper, double step )
-void constrainedEffectivePotential_inBrokenPhase::determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper)
+// int CEP_inBrokenPhase::determine_startingAndInitialize( double lower, double upper, double step )
+void CEP_inBrokenPhase::determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper)
 {
 	const int MAXSCAN=1000;
 	if( (inUpper - inLower <= 0.0 || inStep <=0.0) )
 	{
-		std::cerr <<"Error, inconsitent scan range in constrainedEffectivePotential_inBrokenPhase::determine_startingAndInitialize" <<std::endl;
+		std::cerr <<"Error, inconsitent scan range in CEP_inBrokenPhase::determine_startingAndInitialize" <<std::endl;
 		exit(EXIT_FAILURE);
 	}
 	int numberOfEntries=static_cast< int >( (inUpper-inLower)/inStep + 1.5);
 	if( numberOfEntries > MAXSCAN )
 	{
-		std::cerr << "Error, to many testValues in constrainedEffectivePotential_inBrokenPhase::determine_startingAndInitialize." <<std::endl;
+		std::cerr << "Error, to many testValues in CEP_inBrokenPhase::determine_startingAndInitialize." <<std::endl;
 		std::cerr << "Change MAXSCAN if neccessary" <<std::endl;
 	}
 	std::set< double > trialPoints;
@@ -1474,43 +1474,43 @@ void constrainedEffectivePotential_inBrokenPhase::determine_startingPoints( doub
 	}
 }
 
-int constrainedEffectivePotential_inBrokenPhase::iterate_minimizer()
+int CEP_inBrokenPhase::iterate_minimizer()
 {
 	if(!minimizerInitialized)
 	{
-		std::cerr <<"Error, minimizer not initialized in constrainedEffectivePotential_inBrokenPhase::iterate_Minimizer()" <<std::endl;
+		std::cerr <<"Error, minimizer not initialized in CEP_inBrokenPhase::iterate_Minimizer()" <<std::endl;
 		exit(EXIT_FAILURE);
 	}
 	iterator_status = gsl_min_fminimizer_iterate(minimizer);
 	return iterator_status;
 }
 
-double constrainedEffectivePotential_inBrokenPhase::get_actual_minimum()
+double CEP_inBrokenPhase::get_actual_minimum()
 {
 	if(!minimizerInitialized)
 	{
-		std::cerr <<"Error, minimizer not initialized in constrainedEffectivePotential_inBrokenPhase::get_actual_minimum()" <<std::endl;
+		std::cerr <<"Error, minimizer not initialized in CEP_inBrokenPhase::get_actual_minimum()" <<std::endl;
 		exit(EXIT_FAILURE);
 	}
 	return gsl_min_fminimizer_x_minimum(minimizer);
 }
 
-double constrainedEffectivePotential_inBrokenPhase::get_potentialAtMinimum()
+double CEP_inBrokenPhase::get_potentialAtMinimum()
 {
 	if(!minimizerInitialized)
 	{
-		std::cerr <<"Error, minimizer not initialized in constrainedEffectivePotential_inBrokenPhase::get_actual_minimum()" <<std::endl;
+		std::cerr <<"Error, minimizer not initialized in CEP_inBrokenPhase::get_actual_minimum()" <<std::endl;
 		exit(EXIT_FAILURE);
 	}
 	return gsl_min_fminimizer_f_minimum(minimizer);
 }
 
-void constrainedEffectivePotential_inBrokenPhase::get_actual_Interval( double &outMinimum, double &outLower,double &outUpper )
+void CEP_inBrokenPhase::get_actual_Interval( double &outMinimum, double &outLower,double &outUpper )
 {
 	//returns current best interval of minimizer
 	if(!minimizerInitialized)
 	{
-		std::cerr <<"Error, minimizer not initialized in constrainedEffectivePotential_inBrokenPhase::get_actual_Interval" <<std::endl;
+		std::cerr <<"Error, minimizer not initialized in CEP_inBrokenPhase::get_actual_Interval" <<std::endl;
 		exit(EXIT_FAILURE);
 	}
 	outMinimum = gsl_min_fminimizer_x_minimum(minimizer);
@@ -1518,7 +1518,7 @@ void constrainedEffectivePotential_inBrokenPhase::get_actual_Interval( double &o
 	outUpper   = gsl_min_fminimizer_x_upper(minimizer);
 }
 
-bool constrainedEffectivePotential_inBrokenPhase::check_convergence()
+bool CEP_inBrokenPhase::check_convergence()
 {
 	if( gsl_min_test_interval(gsl_min_fminimizer_x_lower(minimizer), gsl_min_fminimizer_x_upper(minimizer), absolute_Accuracy, relative_Accuracy) == GSL_SUCCESS )
 	{
@@ -1527,7 +1527,7 @@ bool constrainedEffectivePotential_inBrokenPhase::check_convergence()
 	return false;
 }
 
-int constrainedEffectivePotential_inBrokenPhase::iterate_minimizer_until_convergence()
+int CEP_inBrokenPhase::iterate_minimizer_until_convergence()
 {
 	int counter=0;
 	for(int i=0; i<max_numberOfIterations; ++i)
@@ -1558,7 +1558,7 @@ int constrainedEffectivePotential_inBrokenPhase::iterate_minimizer_until_converg
 //wrapper for gsl since member function does not work
 double wrapper_compute_CEP_inBrokenPhase_gsl(double value, void *params)
 {
-	constrainedEffectivePotential_inBrokenPhase *CEP = (constrainedEffectivePotential_inBrokenPhase *)params;
+	CEP_inBrokenPhase *CEP = (CEP_inBrokenPhase *)params;
 	return CEP->compute_CEP_inBrokenPhase(value);
 }
 

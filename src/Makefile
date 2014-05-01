@@ -16,12 +16,12 @@ LIBS= -lgsl -lgslcblas -lm -static
 ###   OFILES   ###
 ###########################################
 ##for libs
-constrainedEffectivePotential_inBrokenPhase.o: constrainedEffectivePotential_inBrokenPhase.cc \
-                                               constrainedEffectivePotential_inBrokenPhase.h
+CEP_inBrokenPhase.o: CEP_inBrokenPhase.cc \
+                                               CEP_inBrokenPhase.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
-CEPscan_inBrokenPhase_helper.o: CEPscan_inBrokenPhase_helper.cc \
-                                CEPscan_inBrokenPhase_helper.h
+CEPscan_helper.o: CEPscan_helper.cc \
+                                CEPscan_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 CEP_withFullBosDet.o: CEP_withFullBosDet.cc \
@@ -30,25 +30,25 @@ CEP_withFullBosDet.o: CEP_withFullBosDet.cc \
 ###########################################
 ##for executables
 CEPscan_inBrokenPhase.o: CEPscan_inBrokenPhase.cc \
-                         constrainedEffectivePotential_inBrokenPhase.h \
-                         CEPscan_inBrokenPhase_helper.h
+                         CEP_inBrokenPhase.h \
+                         CEPscan_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 generate_list_of_fermionic_contribution.o: generate_list_of_fermionic_contribution.cc \
-                                           constrainedEffectivePotential_inBrokenPhase.h
+                                           CEP_inBrokenPhase.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 test_CEP_inBrokenPhase.o: test_CEP_inBrokenPhase.cc \
-                          constrainedEffectivePotential_inBrokenPhase.h
+                          CEP_inBrokenPhase.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 speedTest_CEP_inBrokenPhase.o: speedTest_CEP_inBrokenPhase.cc \
-                               constrainedEffectivePotential_inBrokenPhase.h
+                               CEP_inBrokenPhase.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 plotPotential_inBrokenPhase.o: plotPotential_inBrokenPhase.cc \
-                               constrainedEffectivePotential_inBrokenPhase.h \
-                               CEPscan_inBrokenPhase_helper.h
+                               CEP_inBrokenPhase.h \
+                               CEPscan_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
 example_minimizer_CEP_withFullBosDet.o: example_minimizer_CEP_withFullBosDet.cc \

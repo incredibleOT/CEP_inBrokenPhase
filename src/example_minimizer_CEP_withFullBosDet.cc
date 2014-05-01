@@ -15,7 +15,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-int main(int narg,char **arg)
+int main()
 {
 	
 	int L0(32), L1(32), L2(32), L3(64);

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "constrainedEffectivePotential_inBrokenPhase.h"
+#include "CEP_inBrokenPhase.h"
 
 using std::cout;
 using std::cerr;
@@ -20,7 +20,7 @@ int main()
 	double lambda_6(0.05);
 // 	double HiggsMassSquared(0.556140879127285);
 	
-	constrainedEffectivePotential_inBrokenPhase CEP(L0,L1,L2,L3,anti);
+	CEP_inBrokenPhase CEP(L0,L1,L2,L3,anti);
 	
 	CEP.set_yukawas(y_t,y_t);
 	CEP.set_m0Squared(m0Squared);

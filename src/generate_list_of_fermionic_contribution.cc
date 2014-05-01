@@ -9,7 +9,7 @@
 #include <vector>
 
 
-#include "constrainedEffectivePotential_inBrokenPhase.h"
+#include "CEP_inBrokenPhase.h"
 
 
 using std::cout;
@@ -43,7 +43,7 @@ int main(int narg,char **arg)
 		cerr <<"Error, inconsistent range" <<endl;
 	
 	}
-	constrainedEffectivePotential_inBrokenPhase CEP(Ls,Ls,Ls,Lt,anti);
+	CEP_inBrokenPhase CEP(Ls,Ls,Ls,Lt,anti);
 	
 	CEP.set_yukawas(y_t,y_b);
 	

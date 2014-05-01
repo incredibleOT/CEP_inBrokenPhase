@@ -25,27 +25,27 @@ all: ${EXECUTABLES}
 ###   executables  ###
 
 CEPscan_inBrokenPhase: ./src/CEPscan_inBrokenPhase.o   \
-                       ./src/constrainedEffectivePotential_inBrokenPhase.o  \
-                       ./src/CEPscan_inBrokenPhase_helper.o 
+                       ./src/CEP_inBrokenPhase.o  \
+                       ./src/CEPscan_helper.o 
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
 
 plotPotential_inBrokenPhase: ./src/plotPotential_inBrokenPhase.o \
-                             ./src/constrainedEffectivePotential_inBrokenPhase.o   \
-                             ./src/CEPscan_inBrokenPhase_helper.o 
+                             ./src/CEP_inBrokenPhase.o   \
+                             ./src/CEPscan_helper.o 
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
 
 test_CEP_inBrokenPhase: ./src/test_CEP_inBrokenPhase.o \
-                             ./src/constrainedEffectivePotential_inBrokenPhase.o
+                             ./src/CEP_inBrokenPhase.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
 speedTest_CEP_inBrokenPhase: ./src/speedTest_CEP_inBrokenPhase.o \
-                             ./src/constrainedEffectivePotential_inBrokenPhase.o
+                             ./src/CEP_inBrokenPhase.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
 generate_list_of_fermionic_contribution: ./src/generate_list_of_fermionic_contribution.o \
-                             ./src/constrainedEffectivePotential_inBrokenPhase.o
+                             ./src/CEP_inBrokenPhase.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
 example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet.o \
@@ -56,25 +56,25 @@ example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet
 ###   OFILES for executables   ###
 
 ./src/CEPscan_inBrokenPhase.o: ./src/CEPscan_inBrokenPhase.cc \
-                               ./src/constrainedEffectivePotential_inBrokenPhase.h \
-                               ./src/CEPscan_inBrokenPhase_helper.h
+                               ./src/CEP_inBrokenPhase.h \
+                               ./src/CEPscan_helper.h
 	cd ./src; make CEPscan_inBrokenPhase.o; echo
 
 ./src/plotPotential_inBrokenPhase.o: ./src/plotPotential_inBrokenPhase.cc \
-                                     ./src/constrainedEffectivePotential_inBrokenPhase.h \
-                                     ./src/CEPscan_inBrokenPhase_helper.h
+                                     ./src/CEP_inBrokenPhase.h \
+                                     ./src/CEPscan_helper.h
 	cd ./src; make plotPotential_inBrokenPhase.o
 
 ./src/test_CEP_inBrokenPhase.o: ./src/test_CEP_inBrokenPhase.cc \
-                                ./src/constrainedEffectivePotential_inBrokenPhase.h
+                                ./src/CEP_inBrokenPhase.h
 	cd ./src; make test_CEP_inBrokenPhase.o; echo
 
 ./src/speedTest_CEP_inBrokenPhase.o: ./src/speedTest_CEP_inBrokenPhase.cc \
-                                     ./src/constrainedEffectivePotential_inBrokenPhase.h
+                                     ./src/CEP_inBrokenPhase.h
 	cd ./src; make speedTest_CEP_inBrokenPhase.o; echo
 
 ./src/generate_list_of_fermionic_contribution.o: ./src/generate_list_of_fermionic_contribution.cc \
-                                                 ./src/constrainedEffectivePotential_inBrokenPhase.h
+                                                 ./src/CEP_inBrokenPhase.h
 	cd ./src; make generate_list_of_fermionic_contribution.o; echo
 
 
@@ -84,13 +84,13 @@ example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet
 	
 #############################################
 ### OFILES for libs
-./src/constrainedEffectivePotential_inBrokenPhase.o: ./src/constrainedEffectivePotential_inBrokenPhase.cc \
-                                                     ./src/constrainedEffectivePotential_inBrokenPhase.h
-	cd ./src; make constrainedEffectivePotential_inBrokenPhase.o; echo
+./src/CEP_inBrokenPhase.o: ./src/CEP_inBrokenPhase.cc \
+                                                     ./src/CEP_inBrokenPhase.h
+	cd ./src; make CEP_inBrokenPhase.o; echo
 
-./src/CEPscan_inBrokenPhase_helper.o : ./src/CEPscan_inBrokenPhase_helper.cc\
-                                        ./src/CEPscan_inBrokenPhase_helper.h
-	cd ./src; make CEPscan_inBrokenPhase_helper.o; echo
+./src/CEPscan_helper.o : ./src/CEPscan_helper.cc\
+                                        ./src/CEPscan_helper.h
+	cd ./src; make CEPscan_helper.o; echo
 
 ./src/CEP_withFullBosDet.o: ./src/CEP_withFullBosDet.cc \
                             ./src/CEP_withFullBosDet.h

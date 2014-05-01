@@ -10,8 +10,8 @@
 #include <string>
 #include <vector>
 
-#include "constrainedEffectivePotential_inBrokenPhase.h"
-#include "CEPscan_inBrokenPhase_helper.h"
+#include "CEP_inBrokenPhase.h"
+#include "CEPscan_helper.h"
 
 using std::cout;
 using std::cerr;
@@ -24,7 +24,7 @@ int main(int narg,char **arg)
 	std::map< std::string, std::string > parametersString;
 	std::map< std::string, bool > parametersIsSet;
 	
-	CEPscan_inBrokenPhase_helper::prepareParameterMaps_plotPotential(parametersDouble, parametersInt, parametersString, parametersIsSet);
+	CEPscan_helper::prepareParameterMaps_plotPotential_inBrokenPhase(parametersDouble, parametersInt, parametersString, parametersIsSet);
 	size_t numberOfParameters=parametersDouble.size()+parametersInt.size()+parametersString.size();
 	
 	if(narg!=2)
@@ -34,17 +34,17 @@ int main(int narg,char **arg)
 		exit(EXIT_FAILURE);
 	}
 	
-	if( !CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile(parametersDouble, parametersInt, parametersString, parametersIsSet, arg[1]) )
+	if( !CEPscan_helper::loadParameterMapsFromFile(parametersDouble, parametersInt, parametersString, parametersIsSet, arg[1]) )
 	{
 		cerr <<"Error loading input file" <<endl <<arg[1] <<endl;
 		exit(EXIT_FAILURE);
 	}
 	
 	cout <<endl <<"Parameters loaded:" <<endl;
-	CEPscan_inBrokenPhase_helper::streamSetParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet,cout);
+	CEPscan_helper::streamSetParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet,cout);
 	
 	cout <<endl <<"Check consistency of parameters" <<endl;
-	if(!(CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters_plotPotential(parametersDouble, parametersInt, parametersString, parametersIsSet)))
+	if(!(CEPscan_helper::checkConsistencyOfParameters_plotPotential_inBrokenPhase(parametersDouble, parametersInt, parametersString, parametersIsSet)))
 	{
 		cerr <<"Failed! Some parameters are inconsistent!" <<endl;
 		exit(EXIT_FAILURE);
@@ -53,7 +53,7 @@ int main(int narg,char **arg)
 	
 	
 	int Ls(parametersInt["L_s"]), Lt(parametersInt["L_t"]);
-	constrainedEffectivePotential_inBrokenPhase CEP(Ls,Ls,Ls,Lt,parametersInt["antiperiodic_L_t"]);
+	CEP_inBrokenPhase CEP(Ls,Ls,Ls,Lt,parametersInt["antiperiodic_L_t"]);
 	
 	
 	
@@ -194,7 +194,7 @@ int main(int narg,char **arg)
 				toContinue=false;
 			}
 			//check for periodic solution
-			std::map< int, double >::iterator closest=CEPscan_inBrokenPhase_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
+			std::map< int, double >::iterator closest=CEPscan_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
 			if( std::abs( 2.0*( closest->second - new_HiggsMassSquared)/(closest->second + new_HiggsMassSquared)) < accuracy_for_periodicity )
 			{
 				int period=counter+1-closest->first;
@@ -270,7 +270,7 @@ int main(int narg,char **arg)
 	
 	
 	std::set< double > field;
-	CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["field_min"], parametersDouble["field_max"], parametersDouble["field_step"], field);
+	CEPscan_helper::fillSetWithRange( parametersDouble["field_min"], parametersDouble["field_max"], parametersDouble["field_step"], field);
 	
 	//stores <field, potential>
 	std::map< double, double > result;
@@ -283,7 +283,7 @@ int main(int narg,char **arg)
 	
 	if(parametersIsSet["outputfile"])
 	{
-		std::string outputFileName( CEPscan_inBrokenPhase_helper::generate_outputFileName_plotPotential( parametersString["outputfile"], parametersDouble, parametersInt, parametersIsSet) );
+		std::string outputFileName( CEPscan_helper::generate_outputFileName_plotPotential_inBrokenPhase( parametersString["outputfile"], parametersDouble, parametersInt, parametersIsSet) );
 		
 		cout <<"print output to: " <<outputFileName <<endl;
 		
@@ -298,7 +298,7 @@ int main(int narg,char **arg)
 			outputFile.precision(14);
 			outputFile <<"# Output of plotPotential_inBrokenPhase" <<endl;
 			outputFile <<"# parameters set:" <<endl;
-			CEPscan_inBrokenPhase_helper::streamSetParameterMaps( parametersDouble, parametersInt, parametersString, parametersIsSet, outputFile, "#");
+			CEPscan_helper::streamSetParameterMaps( parametersDouble, parametersInt, parametersString, parametersIsSet, outputFile, "#");
 			outputFile <<"# Location of minimum: " <<CEP.get_actual_minimum() <<endl;
 			outputFile <<"# curvature at minimum: " <<CEP.get_actual_HiggsMassSquared() <<endl;
 			outputFile <<"# Output format is:" <<endl;

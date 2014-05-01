@@ -1,7 +1,7 @@
-#include "CEPscan_inBrokenPhase_helper.h"
+#include "CEPscan_helper.h"
 
 
-void CEPscan_inBrokenPhase_helper::prepareParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+void CEPscan_helper::prepareParameterMaps_inBrokenPhase( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
 {
 	paraD.clear(); paraI.clear(); paraS.clear(); paraIsSet.clear();
 	
@@ -92,7 +92,7 @@ void CEPscan_inBrokenPhase_helper::prepareParameterMaps( std::map< std::string, 
 
 
 
-void CEPscan_inBrokenPhase_helper::prepareParameterMaps_plotPotential( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+void CEPscan_helper::prepareParameterMaps_plotPotential_inBrokenPhase( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
 {
 	paraD.clear(); paraI.clear(); paraS.clear(); paraIsSet.clear();
 	
@@ -164,7 +164,7 @@ void CEPscan_inBrokenPhase_helper::prepareParameterMaps_plotPotential( std::map<
 
 
 
-bool CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, const std::string &fileName )
+bool CEPscan_helper::loadParameterMapsFromFile( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, const std::string &fileName )
 {
 	std::ifstream inputFile(fileName.c_str());
 	std::string line,word;
@@ -219,7 +219,7 @@ bool CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile( std::map< std::str
 
 
 
-void CEPscan_inBrokenPhase_helper::streamSetParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, std::ostream &output, const std::string &prefix)
+void CEPscan_helper::streamSetParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, std::ostream &output, const std::string &prefix)
 {
 	output.precision(10);
 	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
@@ -251,7 +251,7 @@ void CEPscan_inBrokenPhase_helper::streamSetParameterMaps( std::map< std::string
 
 
 
-void CEPscan_inBrokenPhase_helper::streamParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::ostream &output, const std::string &prefix)
+void CEPscan_helper::streamParameterMaps( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::ostream &output, const std::string &prefix)
 {
 	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
 	{
@@ -272,7 +272,7 @@ void CEPscan_inBrokenPhase_helper::streamParameterMaps( std::map< std::string, d
 
 
 
-bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+bool CEPscan_helper::checkConsistencyOfParameters_inBrokenPhase( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
 {
 	//extend related
 	if(!(paraIsSet["L_s"] && paraIsSet["L_t"]) || paraI["L_s"]<=0 || paraI["L_t"]<=0)
@@ -439,7 +439,7 @@ bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters( std::map< std::
 
 
 
-bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters_plotPotential( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+bool CEPscan_helper::checkConsistencyOfParameters_plotPotential_inBrokenPhase( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
 {
 	//extend related
 	if(!(paraIsSet["L_s"] && paraIsSet["L_t"]) || paraI["L_s"]<=0 || paraI["L_t"]<=0)
@@ -531,7 +531,7 @@ bool CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters_plotPotential( s
 
 
 
-void CEPscan_inBrokenPhase_helper::fillSetWithRange( const double min, const double max, const double step, std::set< double > &toFill)
+void CEPscan_helper::fillSetWithRange( const double min, const double max, const double step, std::set< double > &toFill)
 {
 	toFill.clear();
 	
@@ -551,7 +551,7 @@ void CEPscan_inBrokenPhase_helper::fillSetWithRange( const double min, const dou
 
 
 
-bool CEPscan_inBrokenPhase_helper::printResultsVectorToStream(const std::vector< resultForOutput > &results, std::ostream &output)
+bool CEPscan_helper::printResultsVectorToStream(const std::vector< resultForOutput > &results, std::ostream &output)
 {
 	//increase precision, but store the old one
 	std::streamsize oldPrec=output.precision();
@@ -570,7 +570,7 @@ bool CEPscan_inBrokenPhase_helper::printResultsVectorToStream(const std::vector<
 
 
 
-std::map< int, double >::iterator CEPscan_inBrokenPhase_helper::findClosestMass( std::map< int, double > &HiggsMassesSquared, double value )
+std::map< int, double >::iterator CEPscan_helper::findClosestMass( std::map< int, double > &HiggsMassesSquared, double value )
 {
 	if( HiggsMassesSquared.empty() ){ return HiggsMassesSquared.end(); }
 	
@@ -589,7 +589,7 @@ std::map< int, double >::iterator CEPscan_inBrokenPhase_helper::findClosestMass(
 }
 	
 
-std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet )
+std::string CEPscan_helper::generate_outputFileName_inBrokenPhase(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet )
 {
 	//replaces placeholders in the filename
 	// [Ls]->Lxx, [Lt]->Txx, [m0Sq_k]->m0Sq_xxx_xxx or k_xxx_xxx, [l]->l_xxx_xxx ->[l6]->l6_xxx_xxx
@@ -670,7 +670,7 @@ std::string CEPscan_inBrokenPhase_helper::generate_outputFileName(const std::str
 	
 	
 	
-std::string CEPscan_inBrokenPhase_helper::generate_outputFileName_plotPotential(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet )
+std::string CEPscan_helper::generate_outputFileName_plotPotential_inBrokenPhase(const std::string &baseName, std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, bool > &paraIsSet )
 {
 	//replaces placeholders in the filename
 	// [Ls]->Lxx, [Lt]->Txx, [m0Sq_k]->m0Sq_xxx_xxx or k_xxx_xxx, [l]->l_xxx_xxx ->[l6]->l6_xxx_xxx

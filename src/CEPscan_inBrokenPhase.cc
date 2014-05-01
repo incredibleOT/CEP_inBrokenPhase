@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#include "constrainedEffectivePotential_inBrokenPhase.h"
-#include "CEPscan_inBrokenPhase_helper.h"
+#include "CEP_inBrokenPhase.h"
+#include "CEPscan_helper.h"
 
 using std::cout;
 using std::cerr;
@@ -22,7 +22,7 @@ int main(int narg,char **arg)
 	std::map< std::string, std::string > parametersString;
 	std::map< std::string, bool > parametersIsSet;
 	
-	CEPscan_inBrokenPhase_helper::prepareParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet);
+	CEPscan_helper::prepareParameterMaps_inBrokenPhase(parametersDouble, parametersInt, parametersString, parametersIsSet);
 	size_t numberOfParameters=parametersDouble.size()+parametersInt.size()+parametersString.size();
 	
 	if(narg!=2)
@@ -32,17 +32,17 @@ int main(int narg,char **arg)
 		exit(EXIT_FAILURE);
 	}
 	
-	if( !CEPscan_inBrokenPhase_helper::loadParameterMapsFromFile(parametersDouble, parametersInt, parametersString, parametersIsSet, arg[1]) )
+	if( !CEPscan_helper::loadParameterMapsFromFile(parametersDouble, parametersInt, parametersString, parametersIsSet, arg[1]) )
 	{
 		cerr <<"Error loading input file" <<endl <<arg[1] <<endl;
 		exit(EXIT_FAILURE);
 	}
 	
 	cout <<endl <<"Parameters loaded:" <<endl;
-	CEPscan_inBrokenPhase_helper::streamSetParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet,cout);
+	CEPscan_helper::streamSetParameterMaps(parametersDouble, parametersInt, parametersString, parametersIsSet,cout);
 	
 	cout <<endl <<"Check consistency of parameters" <<endl;
-	if(!(CEPscan_inBrokenPhase_helper::checkConsistencyOfParameters(parametersDouble, parametersInt, parametersString, parametersIsSet)))
+	if(!(CEPscan_helper::checkConsistencyOfParameters_inBrokenPhase(parametersDouble, parametersInt, parametersString, parametersIsSet)))
 	{
 		cerr <<"Failed! Some parameters are inconsistent!" <<endl;
 		exit(EXIT_FAILURE);
@@ -53,7 +53,7 @@ int main(int narg,char **arg)
 	
 	
 	int Ls(parametersInt["L_s"]), Lt(parametersInt["L_t"]);
-	constrainedEffectivePotential_inBrokenPhase CEP(Ls,Ls,Ls,Lt,parametersInt["antiperiodic_L_t"]);
+	CEP_inBrokenPhase CEP(Ls,Ls,Ls,Lt,parametersInt["antiperiodic_L_t"]);
 	
 	
 	//set N_f, rho, r if set an different
@@ -88,7 +88,7 @@ int main(int narg,char **arg)
 	{
 		if(parametersIsSet["scan_kappa"] && parametersInt["scan_kappa"] )
 		{
-			CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["kappa_min"], parametersDouble["kappa_max"], parametersDouble["kappa_step"], m0Squared_or_kappa_values );
+			CEPscan_helper::fillSetWithRange( parametersDouble["kappa_min"], parametersDouble["kappa_max"], parametersDouble["kappa_step"], m0Squared_or_kappa_values );
 		}
 		else{ m0Squared_or_kappa_values.insert(parametersDouble["kappa"]); }
 	}
@@ -96,32 +96,32 @@ int main(int narg,char **arg)
 	{
 		if(parametersIsSet["scan_m0Squared"] && parametersInt["scan_m0Squared"] )
 		{
-			CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["m0Squared_min"], parametersDouble["m0Squared_max"], parametersDouble["m0Squared_step"], m0Squared_or_kappa_values );
+			CEPscan_helper::fillSetWithRange( parametersDouble["m0Squared_min"], parametersDouble["m0Squared_max"], parametersDouble["m0Squared_step"], m0Squared_or_kappa_values );
 		}
 		else{ m0Squared_or_kappa_values.insert(parametersDouble["m0Squared"]); }
 	}
 	//lambda
 	if(parametersIsSet["scan_lambda"] && parametersInt["scan_lambda"] )
 	{
-		CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["lambda_min"], parametersDouble["lambda_max"], parametersDouble["lambda_step"], lambda_values );
+		CEPscan_helper::fillSetWithRange( parametersDouble["lambda_min"], parametersDouble["lambda_max"], parametersDouble["lambda_step"], lambda_values );
 	}
 	else{ lambda_values.insert(parametersDouble["lambda"]); }
 	//lambda_6
 	if(parametersIsSet["scan_lambda_6"] && parametersInt["scan_lambda_6"] )
 	{
-		CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["lambda_6_min"], parametersDouble["lambda_6_max"], parametersDouble["lambda_6_step"], lambda_6_values );
+		CEPscan_helper::fillSetWithRange( parametersDouble["lambda_6_min"], parametersDouble["lambda_6_max"], parametersDouble["lambda_6_step"], lambda_6_values );
 	}
 	else{ lambda_6_values.insert(parametersDouble["lambda_6"]); }
 	//yukawa_t
 	if(parametersIsSet["scan_yukawa_t"] && parametersInt["scan_yukawa_t"] )
 	{
-		CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["yukawa_t_min"], parametersDouble["yukawa_t_max"], parametersDouble["yukawa_t_step"], yukawa_t_values );
+		CEPscan_helper::fillSetWithRange( parametersDouble["yukawa_t_min"], parametersDouble["yukawa_t_max"], parametersDouble["yukawa_t_step"], yukawa_t_values );
 	}
 	else{ yukawa_t_values.insert(parametersDouble["yukawa_t"]); }
 	//yukawa_ratio
 	if(parametersIsSet["scan_yukawa_ratio"] && parametersInt["scan_yukawa_ratio"] )
 	{
-		CEPscan_inBrokenPhase_helper::fillSetWithRange( parametersDouble["yukawa_ratio_min"], parametersDouble["yukawa_ratio_max"], parametersDouble["yukawa_ratio_step"], yukawa_ratio_values );
+		CEPscan_helper::fillSetWithRange( parametersDouble["yukawa_ratio_min"], parametersDouble["yukawa_ratio_max"], parametersDouble["yukawa_ratio_step"], yukawa_ratio_values );
 	}
 	else{ yukawa_ratio_values.insert(parametersDouble["yukawa_ratio"]); }
 
@@ -131,7 +131,7 @@ int main(int narg,char **arg)
 	
 	cout <<"start scanning" <<endl;
 	cout.precision(12);
-	std::vector< CEPscan_inBrokenPhase_helper::resultForOutput > results;
+	std::vector< CEPscan_helper::resultForOutput > results;
 	double lastHiggsMassSquared(0.0000001);
 	//now iterate
 	for(std::set< double >::const_iterator yukawa_t=yukawa_t_values.begin(); yukawa_t!=yukawa_t_values.end(); ++yukawa_t)
@@ -280,7 +280,7 @@ int main(int narg,char **arg)
 									break; //redundant....
 								}
 								//check for periodic solution
-								std::map< int, double >::iterator closest=CEPscan_inBrokenPhase_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
+								std::map< int, double >::iterator closest=CEPscan_helper::findClosestMass( HiggsMassesSquared,  new_HiggsMassSquared );
 								if( std::abs( 2.0*( closest->second - new_HiggsMassSquared)/(closest->second + new_HiggsMassSquared)) < accuracy_for_periodicity )
 								{
 									int period=counter+1-closest->first;
@@ -341,7 +341,7 @@ int main(int narg,char **arg)
 							}
 						}
 						if(skipValue){ continue; }
-						CEPscan_inBrokenPhase_helper::resultForOutput dummy;
+						CEPscan_helper::resultForOutput dummy;
 						dummy.m0Squared = CEP.get_m0Squared();
 						dummy.lambda    = CEP.get_lambda();
 						dummy.lambda_6  = CEP.get_lambda_6();
@@ -363,13 +363,13 @@ int main(int narg,char **arg)
 	//output to cout
 	{
 		cout <<"Results (m0Squared,   lambda,   lambda_6,   yukawa_t,   yukawa_b,   minimum,   mHSquared,   potential:" <<endl;
-		CEPscan_inBrokenPhase_helper::printResultsVectorToStream( results, cout );
+		CEPscan_helper::printResultsVectorToStream( results, cout );
 	}
 	
 	
 	if(parametersIsSet["outputfile"])
 	{
-		std::string outputFileName( CEPscan_inBrokenPhase_helper::generate_outputFileName( parametersString["outputfile"], parametersDouble, parametersInt, parametersIsSet) );
+		std::string outputFileName( CEPscan_helper::generate_outputFileName_inBrokenPhase( parametersString["outputfile"], parametersDouble, parametersInt, parametersIsSet) );
 		
 		cout <<"print output to: " <<outputFileName <<endl;
 		
@@ -383,10 +383,10 @@ int main(int narg,char **arg)
 		{
 			outputFile <<"# Output of CEPscan_inBrokenPhase" <<endl;
 			outputFile <<"# parameters set:" <<endl;
-			CEPscan_inBrokenPhase_helper::streamSetParameterMaps( parametersDouble, parametersInt, parametersString, parametersIsSet, outputFile, "#");
+			CEPscan_helper::streamSetParameterMaps( parametersDouble, parametersInt, parametersString, parametersIsSet, outputFile, "#");
 			outputFile <<"# Output format is:" <<endl;
 			outputFile <<"# m0Squared   lambda   lambda_6   yukawa_t   yukawa_b   minimum   mHSquared   potential" <<endl;
-			CEPscan_inBrokenPhase_helper::printResultsVectorToStream(results, outputFile);
+			CEPscan_helper::printResultsVectorToStream(results, outputFile);
 			outputFile.close();
 		}
 	}
@@ -399,7 +399,7 @@ int main(int narg,char **arg)
 		cerr <<"parametersInt.size()=" <<parametersInt.size() <<endl;
 		cerr <<"parametersString.size()=" <<parametersString.size() <<endl;
 		cerr <<"parametersIsSet.size()=" <<parametersIsSet.size() <<endl;
-		CEPscan_inBrokenPhase_helper::streamParameterMaps(parametersDouble, parametersInt, parametersString, cout);
+		CEPscan_helper::streamParameterMaps(parametersDouble, parametersInt, parametersString, cout);
 		exit(EXIT_FAILURE);
 	}
 	
