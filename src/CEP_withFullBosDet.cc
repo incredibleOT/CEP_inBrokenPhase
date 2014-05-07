@@ -1295,7 +1295,157 @@ double CEP_withFullBosDet::compute_firstOrderInLambdas( double value )
 	}
 }
 
+double CEP_withFullBosDet::compute_CEP_withFullBosDet_secondDerivative( double value )
+{
+	//computes U''(v) = U_tree'' + U_ferm'' + U_1st'' + I_det''
+	//returns +infinity in case of regions with negative determinant
+	// check, if gaussian part is positive definite
+	if (  (lambda!=0.0 || lambda_6!=0.0) &&
+		   ( (m0Squared  +  12.0*lambda*value*value  +  30.0*lambda_6*value*value*value*value) <=0.0 ||
+		     (m0Squared  +  4.0*lambda*value*value  +  6.0*lambda_6*value*value*value*value) <=0.0) )
+	{
+		return +1.0/log(1.0);
+	}
+	double result( compute_treeLevel_secondDerivative( value ) );
+	if(yukawa_t != 0.0 || yukawa_b != 0.0){ result += compute_fermionicContribution_secondDerivative( value ); }
+	if(lambda != 0.0 || lambda_6 != 0.0){ result += compute_BosDetContribution_secondDerivative( value ); }
+	if(lambda != 0.0 || lambda_6 != 0.0){ result += compute_firstOrderInLambdas_secondDerivative( value ); }
+	return result;
+	
+}
 
+
+double CEP_withFullBosDet::compute_treeLevel_secondDerivative( double value )
+{
+	// U_tree''(v) =  m0Squared  + 12*lambda * v^2  + 30*lambda_6 * v^4
+	return m0Squared + 12.0*lambda*value*value + 30.0*lambda_6*value*value*value*value;
+}
+	
+double CEP_withFullBosDet::compute_fermionicContribution_secondDerivative( double value )
+{
+	// U_ferm''(v) = U_fpp=sum_p{-2*y_t^2*Re[w^2/z_t^2]} + , sum_p{-2*y_b^2*Re[w^2/z_b^2]} with w = 1 - 1/(2 rho)*nu, z_t/b=(nu +  y_t/b * v *w)
+	if(eigenvalues_of_overlap==0){ fill_eigenvaluesAndFactors(); }
+	double dummy(0.0);
+	double fac_t=yukawa_t*value;
+	double fac_b=yukawa_b*value;
+	double y_t_Squared(yukawa_t*yukawa_t);
+	double y_b_Squared(yukawa_b*yukawa_b);
+	std::complex< double > z_t, z_b,w;
+	for(int counter=0; counter <numberOfDistingtMomenta_fermions; ++counter)
+	{
+		w=(1.0 - eigenvalues_of_overlap[counter]*one_ov_two_rho);
+		z_t=eigenvalues_of_overlap[counter] + fac_t*w;
+		z_b=eigenvalues_of_overlap[counter] + fac_b*w;
+		dummy += -2.0*factor_for_eigenvalues[counter]*( y_t_Squared * real( w*w/(z_t*z_t) ) + y_b_Squared * real( w*w/(z_b*z_b) ) );
+	}
+	dummy*=-2.0*static_cast< double >(N_f);
+	dummy/= static_cast< double >(L0); dummy/= static_cast< double >(L1); dummy/= static_cast< double >(L2); dummy/= static_cast< double >(L3);
+	return dummy;
+}
+
+
+double CEP_withFullBosDet::compute_BosDetContribution_secondDerivative( double value )
+{
+	//retunrs + inf if gaussian cantribution could be non-positive
+	if( ignore_goldstone_modes )
+	{
+		std::cerr <<"ignore_goldstone_modes==true not implemented in CEP_withFullBosDet::compute_BosDetContribution_secondDerivative" <<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	double termToAdd_H=m0Squared  +  12.0*lambda*value*value  +  30.0*lambda_6*value*value*value*value;
+	double termToAdd_G=m0Squared  +  4.0*lambda*value*value  +  6.0*lambda_6*value*value*value*value;
+	//return ifinity if on of the arguments will be zero (in case of the zero mode, which is excluded, but do so anyways)
+	//NOTE, maybe check for the smallest \hat p^2
+	if( termToAdd_H <=0.0 || termToAdd_G <= 0.0 ){ return +1.0/log(1.0); }
+	double D_H(0.0), D_G(0.0); //p-dependent
+	double D_H_p=24.0*lambda*value + 120.0*lambda_6*value*value*value;
+	double D_H_pp=24.0*lambda + 360.0*lambda_6*value*value;
+	double D_G_p=8.0*lambda*value + 24.0*lambda_6*value*value*value;
+	double D_G_pp=8.0*lambda + 72.0*lambda_6*value*value;
+	
+	if( four_times_sum_of_sinSquared == 0 ){ fill_sinSquaredAndFactors() ; }; //should not happen...
+	double dummy(0.0);
+	for(int counter=0; counter<numberOfDistingtMomenta_bosons; ++counter)
+	{
+		D_H=four_times_sum_of_sinSquared[counter] + termToAdd_H;
+		D_G=four_times_sum_of_sinSquared[counter] + termToAdd_G;
+		dummy+=factor_for_sum_of_sinSquared[counter]*(  (D_H_pp*D_H - D_H_p*D_H_p)/(D_H*D_H) 
+		                                              + 3.0 * (D_G_pp*D_G - D_G_p*D_G_p)/(D_G*D_G)   );
+	}
+	dummy/=static_cast< double >(L0); dummy/=static_cast< double >(L1); dummy/=static_cast< double >(L2); dummy/=static_cast< double >(L3); 
+	dummy/=2.0;
+	return dummy;
+}
+
+
+
+double CEP_withFullBosDet::compute_firstOrderInLambdas_secondDerivative( double value )
+{
+	if(lambda==0.0 && lambda_6==0.0){ return 0.0; }
+	
+	if(  ignore_goldstone_modes  )
+	{
+		std::cerr <<"ignore_goldstone_modes==true not implemented in CEP_withFullBosDet::compute_firstOrderInLambdas_secondDerivative" <<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		double termToAdd_H=m0Squared  +  12.0*lambda*value*value  +  30.0*lambda_6*value*value*value*value;
+		double termToAdd_G=m0Squared  +  4.0*lambda*value*value  +  6.0*lambda_6*value*value*value*value;
+		//return ifinity if on of the arguments will be zero (in case of the zero mode, which is excluded, but do so anyways)
+		//NOTE, maybe check for the smallest \hat p^2
+		if( termToAdd_H <=0.0 || termToAdd_G <= 0.0 ){ return +1.0/log(1.0); }
+	
+// 		double P_H( compute_propagatorSum( termToAdd_H ) );
+// 		double P_G( compute_propagatorSum( termToAdd_G ) );
+		double D_H(0.0), D_G(0.0);
+		double D_H_p=24.0*lambda*value + 120.0*lambda_6*value*value*value;
+		double D_H_pp=24.0*lambda + 360.0*lambda_6*value*value;
+		double D_G_p=8.0*lambda*value + 24.0*lambda_6*value*value*value;
+		double D_G_pp=8.0*lambda + 72.0*lambda_6*value*value;
+		//NOTE make it more flexible at some point
+		double P_H(0.0), P_H_p(0.0), P_H_pp(0.0), P_G(0.0), P_G_p(0.0), P_G_pp(0.0);
+		if( four_times_sum_of_sinSquared == 0 ){ fill_sinSquaredAndFactors() ; }; //should not happen...
+		for(int counter=0; counter<numberOfDistingtMomenta_bosons; ++counter)
+		{
+			D_H=four_times_sum_of_sinSquared[counter] + termToAdd_H;
+			D_G=four_times_sum_of_sinSquared[counter] + termToAdd_G;
+			
+			P_H+=factor_for_sum_of_sinSquared[counter]/D_H;
+			P_G+=factor_for_sum_of_sinSquared[counter]/D_G;
+			
+			P_H_p-=factor_for_sum_of_sinSquared[counter]*( D_H_p/D_H );
+			P_G_p-=factor_for_sum_of_sinSquared[counter]*( D_G_p/D_G );
+			
+			P_H_pp-=factor_for_sum_of_sinSquared[counter]*( (D_H_pp*D_H - 2.0 * D_H_p*D_H_p)/(D_H*D_H*D_H) );
+			P_G_pp-=factor_for_sum_of_sinSquared[counter]*( (D_G_pp*D_G - 2.0 * D_G_p*D_G_p)/(D_G*D_G*D_G) );
+		}
+		P_H/=static_cast< double >(L0); P_H/=static_cast< double >(L1); P_H/=static_cast< double >(L2); P_H/=static_cast< double >(L3); 
+		P_H_p/=static_cast< double >(L0); P_H_p/=static_cast< double >(L1); P_H_p/=static_cast< double >(L2); P_H_p/=static_cast< double >(L3); 
+		P_H_pp/=static_cast< double >(L0); P_H_pp/=static_cast< double >(L1); P_H_pp/=static_cast< double >(L2); P_H_pp/=static_cast< double >(L3); 
+		P_G/=static_cast< double >(L0); P_G/=static_cast< double >(L1); P_G/=static_cast< double >(L2); P_G/=static_cast< double >(L3); 
+		P_G_p/=static_cast< double >(L0); P_G_p/=static_cast< double >(L1); P_G_p/=static_cast< double >(L2); P_G_p/=static_cast< double >(L3); 
+		P_G_pp/=static_cast< double >(L0); P_G_pp/=static_cast< double >(L1); P_G_pp/=static_cast< double >(L2); P_G_pp/=static_cast< double >(L3); 
+		
+		double dummy=lambda * (   6.0 * P_H_p * P_H_p   +   6.0 * P_H * P_H_pp   +   6.0 * P_H_pp * P_G   +   12.0 * P_H_p * P_G_p 
+		                      +   6.0 * P_H * P_G_pp   +   30.0 * P_G_p * P_G_p   +   30.0 * P_G * P_G_p );
+		dummy += lambda_6 * value * value * (
+			                       90.0 * P_H_p * P_H_p   +   90.0 * P_H * P_H_pp   +   54.0 * P_H_pp * P_G   +   108.0 * P_H_p * P_G_p 
+		                      +   54.0 * P_H * P_G_pp   +   90.0 * P_G_p * P_G_p   +   90.0 * P_G * P_G_p );
+		dummy += 4.0 * lambda_6 * value * ( 90.0 * P_H * P_H_p   +   54.0 * P_H_p * P_G   +   54.0 * P_H * P_G_p   +   90.0 * P_G * P_G_p );
+		dummy += 2.0 * lambda_6 * ( 45.0 * P_H * P_H   +   54.0 * P_H * P_G   +   45.0 * P_G * P_G );
+		dummy += lambda_6 * (
+			                       90.0 * P_H * P_H_p * P_H_p   +   45.0 * P_H * P_H * P_H_pp   +   54.0 * P_H_p * P_H_p * P_G 
+			                   +   54.0 * P_H * P_H_pp * P_G   +   108.0 * P_H * P_H_p * P_G_p   +   27.0 * P_H * P_H * P_G_p
+			                   +   45.0 * P_H_pp * P_G * P_G   +   180.0 * P_H_p * P_G * P_G_p   +   90.0 * P_H * P_G_p * P_G_p
+			                   +   90.0 * P_H * P_G * P_G_pp   +   630.0 * P_G * P_G_p * P_G_p   +   315.0 * P_G * P_G * P_G_pp );
+		return dummy;
+		
+	}
+	
+	
+	
+}
 
 void CEP_withFullBosDet::set_max_numberOfIterations(int new_max){ max_numberOfIterations=new_max; }
 void CEP_withFullBosDet::set_relative_Accuracy( double new_rel_acc){ relative_Accuracy=new_rel_acc; }

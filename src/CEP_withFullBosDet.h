@@ -117,12 +117,12 @@ class CEP_withFullBosDet
 	//bool load_fermionicContribution( const std::string &fileName );
 	
 	
-// 	double compute_CEP_withFullBosDet_secondDerivative( double value );
-// 	//parts for CEP_secondDerivative
-// 	double compute_treeLevel_secondDerivative( double value );
-// 	double compute_fermionicContribution_secondDerivative( double value );
-// 	double compute_BosDetContribution_secondDerivative( double value );
-// 	double compute_firstOrderInLambdas_secondDerivative( double value );
+	double compute_CEP_withFullBosDet_secondDerivative( double value );
+	//parts for CEP_secondDerivative
+	double compute_treeLevel_secondDerivative( double value );
+	double compute_fermionicContribution_secondDerivative( double value );
+	double compute_BosDetContribution_secondDerivative( double value );
+	double compute_firstOrderInLambdas_secondDerivative( double value );
 	
 	//stuff for the minimizer
 	//set parameter

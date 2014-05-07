@@ -11,19 +11,19 @@ m0Squared                   0.35
 ## uses kappa instead of m0Squared. If set, setting for m0Squared are ignored
 use_kappa                  0
 # scan_kappa            1
-kappa                   0.35
+kappa                   0.12
 # kappa_min               -0.5
 # kappa_max               +0.5
 # kappa_step              +0.01
 
 # scan_lambda             1
-lambda                    0.3
+lambda                    0.03
 # lambda_min                0.0
 # lambda_max                0.5
 # lambda_step               0.01
 
 # scan_lambda_6             1
-lambda_6                    0.3
+lambda_6                    0.03
 # lambda_6_min                0.0
 # lambda_6_max                0.5
 # lambda_6_step               0.01

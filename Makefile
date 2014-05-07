@@ -17,6 +17,7 @@ EXECUTABLES = CEPscan_inBrokenPhase \
               test_CEP_inBrokenPhase \
               speedTest_CEP_inBrokenPhase \
               generate_list_of_fermionic_contribution \
+              CEPscan_withFullBosDet \
               example_minimizer_CEP_withFullBosDet
 
 all: ${EXECUTABLES}
@@ -48,6 +49,11 @@ generate_list_of_fermionic_contribution: ./src/generate_list_of_fermionic_contri
                              ./src/CEP_inBrokenPhase.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
+CEPscan_withFullBosDet: ./src/CEPscan_withFullBosDet.o   \
+                       ./src/CEP_withFullBosDet.o  \
+                       ./src/CEPscan_helper.o 
+	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
+
 example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet.o \
                                       ./src/CEP_withFullBosDet.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
@@ -77,6 +83,10 @@ example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet
                                                  ./src/CEP_inBrokenPhase.h
 	cd ./src; make generate_list_of_fermionic_contribution.o; echo
 
+./src/CEPscan_withFullBosDet.o: ./src/CEPscan_withFullBosDet.cc \
+                               ./src/CEP_withFullBosDet.h \
+                               ./src/CEPscan_helper.h
+	cd ./src; make CEPscan_withFullBosDet.o; echo
 
 ./src/example_minimizer_CEP_withFullBosDet.o: ./src/example_minimizer_CEP_withFullBosDet.cc \
                                               ./src/CEP_withFullBosDet.h

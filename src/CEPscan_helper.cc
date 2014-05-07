@@ -87,7 +87,7 @@ void CEPscan_helper::prepareParameterMaps_inBrokenPhase( std::map< std::string, 
 	{
 		paraIsSet[iter->first]=false;
 	}
-}//prepareParameterMaps
+}//prepareParameterMaps_inBrokenPhase
 
 
 
@@ -158,6 +158,92 @@ void CEPscan_helper::prepareParameterMaps_plotPotential_inBrokenPhase( std::map<
 		paraIsSet[iter->first]=false;
 	}
 }//prepareParameterMaps_plotPotential
+
+
+
+
+void CEPscan_helper::prepareParameterMaps_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+{
+	paraD.clear(); paraI.clear(); paraS.clear(); paraIsSet.clear();
+	
+	paraI["L_s"]=-1;
+	paraI["L_t"]=-1;
+	paraI["antiperiodic_L_t"]=-1;
+	
+	paraI["scan_m0Squared"]   = 0;
+	paraD["m0Squared"]        = 0.0;
+	paraD["m0Squared_min"]    = 0.0;
+	paraD["m0Squared_max"]    = 0.0;
+	paraD["m0Squared_step"]   = 0.0;
+
+	paraI["use_kappa"]        = 0;
+	paraI["scan_kappa"]       = 0;
+	paraD["kappa"]            = 0.0;
+	paraD["kappa_min"]        = 0.0;
+	paraD["kappa_max"]        = 0.0;
+	paraD["kappa_step"]       = 0.0;
+
+	paraI["scan_lambda"]      = 0;  
+	paraD["lambda"]           = 0.0;
+	paraD["lambda_min"]       = 0.0;
+	paraD["lambda_max"]       = 0.0;
+	paraD["lambda_step"]      = 0.0;
+
+	paraI["scan_lambda_6"]    = 0;
+	paraD["lambda_6"]         = 0.0;
+	paraD["lambda_6_min"]     = 0.0;
+	paraD["lambda_6_max"]     = 0.0;
+	paraD["lambda_6_step"]    = 0.0;
+
+	paraI["scan_yukawa_t"]    = 0;  
+	paraD["yukawa_t"]         = 0.0;
+	paraD["yukawa_t_min"]     = 0.0;
+	paraD["yukawa_t_max"]     = 0.0;
+	paraD["yukawa_t_step"]    = 0.0;
+
+	paraI["scan_yukawa_ratio"]= 0;  
+	paraD["yukawa_ratio"]     = 0.0;
+	paraD["yukawa_ratio_min"] = 0.0;        
+	paraD["yukawa_ratio_max"] = 0.0;
+	paraD["yukawa_ratio_step"]= 0.0;
+	
+	paraI["exclude_goldstones"]=0;
+	
+	// default: N_f=1, rho=1, r=0.5
+	paraI["N_f"]              = 1;
+	paraD["rho"]              = 1.0;
+	paraD["r"]                = 0.5;
+
+	// default: absolut_tolerance_for_minimization=1.0e-1, relative_tolerance_for_minimization=1.0e-7, tolerance_for_HiggsMassSquared=1.0e-5
+	paraD["absolut_tolerance_for_minimization"]  =1.0e-7;
+	paraD["relative_tolerance_for_minimization"] =1.0e-7;
+	
+	//default 100 each
+	paraI["max_numer_of_iterations_minimizer"]        = 100;
+	paraI["max_numer_of_iterations_HiggsMassSquared"] = 100;
+		
+	// 1 gsl_min_fminimizer_goldensection, 2 gsl_min_fminimizer_brent, 3 gsl_min_fminimizer_quad_golden
+	paraI["minimization_algorithm"] = 0;
+
+	paraD["testvalue_min"]              = 0.0; 
+	paraD["testvalue_max"]              = 0.0; 
+	paraD["testvalue_step"]             = 0.0;
+
+	paraS["outputfile"]             ="";
+	
+	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+	for( std::map< std::string, int >::const_iterator iter=paraI.begin(); iter!=paraI.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+	for( std::map< std::string, std::string >::const_iterator iter=paraS.begin(); iter!=paraS.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+}//prepareParameterMaps_withFullBosDet
 
 
 
@@ -434,7 +520,7 @@ bool CEPscan_helper::checkConsistencyOfParameters_inBrokenPhase( std::map< std::
 	}
 	
 	return true;
-}//checkConsistencyOfParameters
+}//checkConsistencyOfParameters_inBrokenPhase
 
 
 
@@ -525,7 +611,161 @@ bool CEPscan_helper::checkConsistencyOfParameters_plotPotential_inBrokenPhase( s
 		}
 	}
 	return true;
-}//checkConsistencyOfParameters_plotPotential
+}//checkConsistencyOfParameters_plotPotential_inBrokenPhase
+
+
+
+
+bool CEPscan_helper::checkConsistencyOfParameters_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+{
+	//extend related
+	if(!(paraIsSet["L_s"] && paraIsSet["L_t"]) || paraI["L_s"]<=0 || paraI["L_t"]<=0)
+	{
+		std::cerr <<"Error, no or non-positive lattice extends given" <<std::endl;
+		return false;
+	}
+	if(paraI["L_s"]%2!=0 || paraI["L_t"]%2!=0)
+	{
+		std::cerr <<"Error, only even lattice extend allowed" <<std::endl;
+		return false;
+	}
+	if(!paraIsSet["antiperiodic_L_t"])
+	{
+		std::cerr <<"Error, antiperiodic_L_t is not specified" <<std::endl;
+		return false;
+	}
+	//m0Squared (only if not use_kappa is set)
+	if(!paraI["use_kappa"])
+	if( (!paraIsSet["scan_m0Squared"] || paraI["scan_m0Squared"]==0) && !paraIsSet["m0Squared"])
+	{
+		std::cerr <<"Error, no m0Squared given" <<std::endl;
+		return false;
+	}
+	if( paraIsSet["scan_m0Squared"] && paraI["scan_m0Squared"] )
+	{
+		if( !( paraIsSet["m0Squared_min"] && paraIsSet["m0Squared_max"] && paraIsSet["m0Squared_step"] ) )
+		{
+			std::cerr <<"Error, no scan range in m0Squared given" <<std::endl;
+			return false;
+		}
+		if( paraD["m0Squared_max"] < paraD["m0Squared_min"] || paraD["m0Squared_step"] <=0.0 )
+		{
+			std::cerr <<"Error, inconsistent scan range in m0Squared" <<std::endl;
+			return false;
+		}
+	}
+	//
+	if(paraI["use_kappa"])
+	if( (!paraIsSet["scan_kappa"] || paraI["scan_kappa"]==0) && !paraIsSet["kappa"])
+	{
+		std::cerr <<"Error, no kappa given" <<std::endl;
+		return false;
+	}
+	if( paraIsSet["scan_kappa"] && paraI["scan_kappa"] )
+	{
+		if( !( paraIsSet["kappa_min"] && paraIsSet["kappa_max"] && paraIsSet["kappa_step"] ) )
+		{
+			std::cerr <<"Error, no scan range in kappa given" <<std::endl;
+			return false;
+		}
+		if( paraD["kappa_max"] < paraD["kappa_min"] || paraD["kappa_step"] <=0.0 )
+		{
+			std::cerr <<"Error, inconsistent scan range in kappa" <<std::endl;
+			return false;
+		}
+	}
+	//lambda
+	if( (!paraIsSet["scan_lambda"] || paraI["scan_lambda"]==0) && !paraIsSet["lambda"])
+	{
+		std::cerr <<"Error, no lambda given" <<std::endl;
+		return false;
+	}
+	if( paraIsSet["scan_lambda"] && paraI["scan_lambda"] )
+	{
+		if( !( paraIsSet["lambda_min"] && paraIsSet["lambda_max"] && paraIsSet["lambda_step"] ) )
+		{
+			std::cerr <<"Error, no scan range in lambda given" <<std::endl;
+			return false;
+		}
+		if( paraD["lambda_max"] < paraD["lambda_min"] || paraD["lambda_step"] <=0.0 )
+		{
+			std::cerr <<"Error, inconsistent scan range in lambda" <<std::endl;
+			return false;
+		}
+	}
+	//lambda_6
+	if( (!paraIsSet["scan_lambda_6"] || paraI["scan_lambda_6"]==0) && !paraIsSet["lambda_6"])
+	{
+		std::cerr <<"Error, no lambda_6 given" <<std::endl;
+		return false;
+	}
+	if( paraIsSet["scan_lambda_6"] && paraI["scan_lambda_6"] )
+	{
+		if( !( paraIsSet["lambda_6_min"] && paraIsSet["lambda_6_max"] && paraIsSet["lambda_6_step"] ) )
+		{
+			std::cerr <<"Error, no scan range in lambda_6 given" <<std::endl;
+			return false;
+		}
+		if( paraD["lambda_6_max"] < paraD["lambda_6_min"] || paraD["lambda_6_step"] <=0.0 )
+		{
+			std::cerr <<"Error, inconsistent scan range in lambda_6" <<std::endl;
+			return false;
+		}
+	}
+	//yukawa_t
+	if( (!paraIsSet["scan_yukawa_t"] || paraI["scan_yukawa_t"]==0) && !paraIsSet["yukawa_t"])
+	{
+		std::cerr <<"Error, no yukawa_t given" <<std::endl;
+		return false;
+	}
+	if( paraIsSet["scan_yukawa_t"] && paraI["scan_yukawa_t"] )
+	{
+		if( !( paraIsSet["yukawa_t_min"] && paraIsSet["yukawa_t_max"] && paraIsSet["yukawa_t_step"] ) )
+		{
+			std::cerr <<"Error, no scan range in yukawa_t given" <<std::endl;
+			return false;
+		}
+		if( paraD["yukawa_t_max"] < paraD["yukawa_t_min"] || paraD["yukawa_t_step"] <=0.0 )
+		{
+			std::cerr <<"Error, inconsistent scan range in yukawa_t" <<std::endl;
+			return false;
+		}
+	}
+	//yukawa_ratio
+	if( (!paraIsSet["scan_yukawa_ratio"] || paraI["scan_yukawa_ratio"]==0) && !paraIsSet["yukawa_ratio"])
+	{
+		std::cerr <<"Error, no yukawa_ratio given" <<std::endl;
+		return false;
+	}
+	if( paraIsSet["scan_yukawa_ratio"] && paraI["scan_yukawa_ratio"] )
+	{
+		if( !( paraIsSet["yukawa_ratio_min"] && paraIsSet["yukawa_ratio_max"] && paraIsSet["yukawa_ratio_step"] ) )
+		{
+			std::cerr <<"Error, no scan range in yukawa_ratio given" <<std::endl;
+			return false;
+		}
+		if( paraD["yukawa_ratio_max"] < paraD["yukawa_ratio_min"] || paraD["yukawa_ratio_step"] <=0.0 )
+		{
+			std::cerr <<"Error, inconsistent scan range in yukawa_ratio" <<std::endl;
+			return false;
+		}
+	}
+	//testvalue
+	if(!(paraIsSet["testvalue_min"] && paraIsSet["testvalue_max"] && paraIsSet["testvalue_step"]))
+	{
+		std::cerr <<"Error, no scan range for testvalue given" <<std::endl;
+		return false;
+	}
+	if( paraD["testvalue_max"] < paraD["testvalue_min"] || paraD["testvalue_step"] <=0.0 )
+	{
+		std::cerr <<"Error, inconsistent scan range in testvalue" <<std::endl;
+		return false;
+	}
+	
+	return true;
+}//checkConsistencyOfParameters_withFullBosDet
+
+
 
 
 

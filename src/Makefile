@@ -51,6 +51,11 @@ plotPotential_inBrokenPhase.o: plotPotential_inBrokenPhase.cc \
                                CEPscan_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
+CEPscan_withFullBosDet.o: CEPscan_withFullBosDet.cc \
+                          CEP_withFullBosDet.h \
+                          CEPscan_helper.h
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
+
 example_minimizer_CEP_withFullBosDet.o: example_minimizer_CEP_withFullBosDet.cc \
                                         CEP_withFullBosDet.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
