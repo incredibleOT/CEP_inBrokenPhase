@@ -60,6 +60,12 @@ example_minimizer_CEP_withFullBosDet.o: example_minimizer_CEP_withFullBosDet.cc 
                                         CEP_withFullBosDet.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
+plotPotential_withFullBosDet.o: plotPotential_withFullBosDet.cc \
+                               CEP_withFullBosDet.h \
+                               CEPscan_helper.h
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
+
+	
 clean:
 	rm *.o
 

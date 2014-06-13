@@ -25,6 +25,8 @@ namespace CEPscan_helper
 	//prepares the parameterMaps for CEPscan_withFullBosDet
 	void prepareParameterMaps_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
 	
+	//prepares the parameterMaps for plotPotential_withFullBosDet
+	void prepareParameterMaps_plotPotential_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
 	
 	bool loadParameterMapsFromFile( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet, const std::string &fileName );
 	
@@ -37,6 +39,8 @@ namespace CEPscan_helper
 	bool checkConsistencyOfParameters_plotPotential_inBrokenPhase( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
 	
 	bool checkConsistencyOfParameters_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
+	
+	bool checkConsistencyOfParameters_plotPotential_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet );
 	
 	
 	void fillSetWithRange( const double min, const double max, const double step, std::set< double > &toFill );

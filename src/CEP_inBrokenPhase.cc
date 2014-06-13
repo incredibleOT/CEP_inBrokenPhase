@@ -1232,7 +1232,7 @@ double CEP_inBrokenPhase::compute_fermionicContribution( double value )
 	{
 		z_t=eigenvalues_of_overlap[counter] + fac_t*(1.0 - eigenvalues_of_overlap[counter]*one_ov_two_rho);
 		z_b=eigenvalues_of_overlap[counter] + fac_b*(1.0 - eigenvalues_of_overlap[counter]*one_ov_two_rho);
-		dummy += static_cast< long double >( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) ) + log( real( z_b * conj(z_b) ) ) ) );
+		dummy += static_cast< long double >( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) * real( z_b * conj(z_b) ) ) ) );
 // 		dummy += ( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) ) + log( real( z_b * conj(z_b) ) ) ) );
 	}
 	dummy*=-2.0*static_cast< double >(N_f);

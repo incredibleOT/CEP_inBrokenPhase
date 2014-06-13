@@ -162,6 +162,61 @@ void CEPscan_helper::prepareParameterMaps_plotPotential_inBrokenPhase( std::map<
 
 
 
+void CEPscan_helper::prepareParameterMaps_plotPotential_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+{
+	paraD.clear(); paraI.clear(); paraS.clear(); paraIsSet.clear();
+	
+	paraI["L_s"]=-1;
+	paraI["L_t"]=-1;
+	paraI["antiperiodic_L_t"]=-1;
+	
+	paraD["m0Squared"]        = 0.0;
+
+	paraI["use_kappa"]        = 0;
+	paraD["kappa"]            = 0.0;
+
+	paraD["lambda"]           = 0.0;
+	
+	paraD["lambda_6"]         = 0.0;
+	
+	paraD["yukawa_t"]         = 0.0;
+	
+	paraD["yukawa_ratio"]     = 0.0;
+	
+	//scanrange
+	paraD["field_min"]        = 0.0;
+	paraD["field_max"]        = 0.0;
+	paraD["field_step"]       = 0.0;
+	
+	// default: N_f=1, rho=1, r=0.5
+	paraI["N_f"]              = 1;
+	paraD["rho"]              = 1.0;
+	paraD["r"]                = 0.5;
+
+	// default: absolut_tolerance_for_minimization=1.0e-1, relative_tolerance_for_minimization=1.0e-7, tolerance_for_HiggsMassSquared=1.0e-5
+	paraD["absolut_tolerance_for_minimization"]  =1.0e-7;
+	paraD["relative_tolerance_for_minimization"] =1.0e-7;
+	
+	
+	paraS["outputfile"]             ="";
+	
+	for( std::map< std::string, double >::const_iterator iter=paraD.begin(); iter!=paraD.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+	for( std::map< std::string, int >::const_iterator iter=paraI.begin(); iter!=paraI.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+	for( std::map< std::string, std::string >::const_iterator iter=paraS.begin(); iter!=paraS.end(); ++iter )
+	{
+		paraIsSet[iter->first]=false;
+	}
+}//prepareParameterMaps_plotPotential_withFullBosDet
+
+
+
+
 void CEPscan_helper::prepareParameterMaps_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
 {
 	paraD.clear(); paraI.clear(); paraS.clear(); paraIsSet.clear();
@@ -767,6 +822,75 @@ bool CEPscan_helper::checkConsistencyOfParameters_withFullBosDet( std::map< std:
 
 
 
+
+bool CEPscan_helper::checkConsistencyOfParameters_plotPotential_withFullBosDet( std::map< std::string, double > &paraD, std::map< std::string, int > &paraI, std::map< std::string, std::string > &paraS, std::map< std::string, bool > &paraIsSet )
+{
+	//extend related
+	if(!(paraIsSet["L_s"] && paraIsSet["L_t"]) || paraI["L_s"]<=0 || paraI["L_t"]<=0)
+	{
+		std::cerr <<"Error, no or non-positive lattice extends given" <<std::endl;
+		return false;
+	}
+	if(paraI["L_s"]%2!=0 || paraI["L_t"]%2!=0)
+	{
+		std::cerr <<"Error, only even lattice extend allowed" <<std::endl;
+		return false;
+	}
+	if(!paraIsSet["antiperiodic_L_t"])
+	{
+		std::cerr <<"Error, antiperiodic_L_t is not specified" <<std::endl;
+		return false;
+	}
+	//m0Squared (only if not use_kappa is set)
+	if( !paraI["use_kappa"] && !paraIsSet["m0Squared"] )
+	{
+		std::cerr <<"Error, no m0Squared given" <<std::endl;
+		return false;
+	}
+	//
+	if( paraI["use_kappa"] && !paraIsSet["kappa"])
+	{
+		std::cerr <<"Error, no kappa given" <<std::endl;
+		return false;
+	}
+	//lambda
+	if( !paraIsSet["lambda"] )
+	{
+		std::cerr <<"Error, no lambda given" <<std::endl;
+		return false;
+	}
+	//lambda_6
+	if( !paraIsSet["lambda_6"] )
+	{
+		std::cerr <<"Error, no lambda_6 given" <<std::endl;
+		return false;
+	}
+	//yukawa_t
+	if( !paraIsSet["yukawa_t"] )
+	{
+		std::cerr <<"Error, no yukawa_t given" <<std::endl;
+		return false;
+	}
+	//yukawa_ratio
+	if( !paraIsSet["yukawa_ratio"] )
+	{
+		std::cerr <<"Error, no yukawa_ratio given" <<std::endl;
+		return false;
+	}
+	//field
+	if(!(paraIsSet["field_min"] && paraIsSet["field_max"] && paraIsSet["field_step"]))
+	{
+		std::cerr <<"Error, no scan range for field given" <<std::endl;
+		return false;
+	}
+	if( paraD["field_max"] < paraD["field_min"] || paraD["field_step"] <=0.0 )
+	{
+		std::cerr <<"Error, inconsistent scan range in field" <<std::endl;
+		return false;
+	}
+	
+	return true;
+}//checkConsistencyOfParameters_plotPotential_withFullBosDet
 
 
 

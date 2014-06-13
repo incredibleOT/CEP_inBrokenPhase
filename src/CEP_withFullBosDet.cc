@@ -1221,6 +1221,7 @@ double CEP_withFullBosDet::compute_fermionicContribution( double value )
 		z_b=eigenvalues_of_overlap[counter] + fac_b*(1.0 - eigenvalues_of_overlap[counter]*one_ov_two_rho);
 		//log(a) + log(b) = log (a*b)
 		dummy += ( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) * real( z_b * conj(z_b) ) ) ) );
+// 		dummy += ( factor_for_eigenvalues[counter]*( log( real( z_t * conj(z_t) ) ) + log( real( z_b * conj(z_b) ) ) ) );
 	}
 	dummy*=-2.0*static_cast< double >(N_f);
 	dummy/= static_cast< double >(L0); dummy/= static_cast< double >(L1); dummy/= static_cast< double >(L2); dummy/= static_cast< double >(L3);
@@ -1250,8 +1251,13 @@ double CEP_withFullBosDet::compute_BosDetContribution( double value )
 	double dummy(0.0);
 	for(int counter=0; counter<numberOfDistingtMomenta_bosons; ++counter)
 	{
-		dummy+=factor_for_sum_of_sinSquared[counter]*(  log(four_times_sum_of_sinSquared[counter] + termToAdd_H) 
-		                                              + 3.0 * log(four_times_sum_of_sinSquared[counter] + termToAdd_G)   );
+// 		dummy+=factor_for_sum_of_sinSquared[counter]*(  log(four_times_sum_of_sinSquared[counter] + termToAdd_H) 
+// 		                                              + 3.0 * log(four_times_sum_of_sinSquared[counter] + termToAdd_G)   );
+		//log(a) + 3*log(b) = log ( a*b*b*b)
+		dummy+=factor_for_sum_of_sinSquared[counter]*(  log( (four_times_sum_of_sinSquared[counter] + termToAdd_H) 
+		                                                    * (four_times_sum_of_sinSquared[counter] + termToAdd_G) 
+		                                                    * (four_times_sum_of_sinSquared[counter] + termToAdd_G)
+		                                                    * (four_times_sum_of_sinSquared[counter] + termToAdd_G) ) );
 	}
 	dummy/=static_cast< double >(L0); dummy/=static_cast< double >(L1); dummy/=static_cast< double >(L2); dummy/=static_cast< double >(L3); 
 	dummy/=2.0;
