@@ -18,7 +18,8 @@ EXECUTABLES = CEPscan_inBrokenPhase \
               speedTest_CEP_inBrokenPhase \
               generate_list_of_fermionic_contribution \
               CEPscan_withFullBosDet \
-              example_minimizer_CEP_withFullBosDet
+              example_minimizer_CEP_withFullBosDet \
+              plotPotential_withFullBosDet
 
 all: ${EXECUTABLES}
 
@@ -58,6 +59,11 @@ example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet
                                       ./src/CEP_withFullBosDet.o
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
+plotPotential_withFullBosDet: ./src/plotPotential_withFullBosDet.o \
+                             ./src/CEP_withFullBosDet.o   \
+                             ./src/CEPscan_helper.o 
+	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
+
 ###########################################3
 ###   OFILES for executables   ###
 
@@ -91,7 +97,13 @@ example_minimizer_CEP_withFullBosDet: ./src/example_minimizer_CEP_withFullBosDet
 ./src/example_minimizer_CEP_withFullBosDet.o: ./src/example_minimizer_CEP_withFullBosDet.cc \
                                               ./src/CEP_withFullBosDet.h
 	cd ./src; make example_minimizer_CEP_withFullBosDet.o; echo
-	
+
+./src/plotPotential_withFullBosDet.o: ./src/plotPotential_withFullBosDet.cc \
+                                     ./src/CEP_withFullBosDet.h \
+                                     ./src/CEPscan_helper.h
+	cd ./src; make plotPotential_withFullBosDet.o
+
+
 #############################################
 ### OFILES for libs
 ./src/CEP_inBrokenPhase.o: ./src/CEP_inBrokenPhase.cc \
