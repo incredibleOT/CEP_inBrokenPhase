@@ -136,6 +136,7 @@ class CEP_withFullBosDet
 	double get_absolute_Accuracy();
 	int get_minimizationAlgorithm(); 
 	
+	//initializing the minimizer
 	bool reInitialize_minimizer( double minimum, double lower, double upper );
 	bool initialize_minimizer( double minimum, double lower, double upper );
 	

@@ -65,6 +65,10 @@ plotPotential_withFullBosDet.o: plotPotential_withFullBosDet.cc \
                                CEPscan_helper.h
 	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
 
+test_CEP_withFullBosDet.o: test_CEP_withFullBosDet.cc \
+                          CEP_withFullBosDet.h
+	${CXX} ${CXXFLAGS} ${INCL} -c -o $@ $<; echo
+
 	
 clean:
 	rm *.o

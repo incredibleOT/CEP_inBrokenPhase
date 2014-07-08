@@ -1420,8 +1420,8 @@ double CEP_withFullBosDet::compute_firstOrderInLambdas_secondDerivative( double 
 			P_H+=factor_for_sum_of_sinSquared[counter]/D_H;
 			P_G+=factor_for_sum_of_sinSquared[counter]/D_G;
 			
-			P_H_p-=factor_for_sum_of_sinSquared[counter]*( D_H_p/D_H );
-			P_G_p-=factor_for_sum_of_sinSquared[counter]*( D_G_p/D_G );
+			P_H_p-=factor_for_sum_of_sinSquared[counter]*( D_H_p/(D_H*D_H) );
+			P_G_p-=factor_for_sum_of_sinSquared[counter]*( D_G_p/(D_G*D_G) );
 			
 			P_H_pp-=factor_for_sum_of_sinSquared[counter]*( (D_H_pp*D_H - 2.0 * D_H_p*D_H_p)/(D_H*D_H*D_H) );
 			P_G_pp-=factor_for_sum_of_sinSquared[counter]*( (D_G_pp*D_G - 2.0 * D_G_p*D_G_p)/(D_G*D_G*D_G) );
@@ -1434,15 +1434,15 @@ double CEP_withFullBosDet::compute_firstOrderInLambdas_secondDerivative( double 
 		P_G_pp/=static_cast< double >(L0); P_G_pp/=static_cast< double >(L1); P_G_pp/=static_cast< double >(L2); P_G_pp/=static_cast< double >(L3); 
 		
 		double dummy=lambda * (   6.0 * P_H_p * P_H_p   +   6.0 * P_H * P_H_pp   +   6.0 * P_H_pp * P_G   +   12.0 * P_H_p * P_G_p 
-		                      +   6.0 * P_H * P_G_pp   +   30.0 * P_G_p * P_G_p   +   30.0 * P_G * P_G_p );
+		                      +   6.0 * P_H * P_G_pp   +   30.0 * P_G_p * P_G_p   +   30.0 * P_G * P_G_pp );
 		dummy += lambda_6 * value * value * (
 			                       90.0 * P_H_p * P_H_p   +   90.0 * P_H * P_H_pp   +   54.0 * P_H_pp * P_G   +   108.0 * P_H_p * P_G_p 
-		                      +   54.0 * P_H * P_G_pp   +   90.0 * P_G_p * P_G_p   +   90.0 * P_G * P_G_p );
+		                      +   54.0 * P_H * P_G_pp   +   90.0 * P_G_p * P_G_p   +   90.0 * P_G * P_G_pp );
 		dummy += 4.0 * lambda_6 * value * ( 90.0 * P_H * P_H_p   +   54.0 * P_H_p * P_G   +   54.0 * P_H * P_G_p   +   90.0 * P_G * P_G_p );
 		dummy += 2.0 * lambda_6 * ( 45.0 * P_H * P_H   +   54.0 * P_H * P_G   +   45.0 * P_G * P_G );
 		dummy += lambda_6 * (
 			                       90.0 * P_H * P_H_p * P_H_p   +   45.0 * P_H * P_H * P_H_pp   +   54.0 * P_H_p * P_H_p * P_G 
-			                   +   54.0 * P_H * P_H_pp * P_G   +   108.0 * P_H * P_H_p * P_G_p   +   27.0 * P_H * P_H * P_G_p
+			                   +   54.0 * P_H * P_H_pp * P_G   +   108.0 * P_H * P_H_p * P_G_p   +   27.0 * P_H * P_H * P_G_pp
 			                   +   45.0 * P_H_pp * P_G * P_G   +   180.0 * P_H_p * P_G * P_G_p   +   90.0 * P_H * P_G_p * P_G_p
 			                   +   90.0 * P_H * P_G * P_G_pp   +   630.0 * P_G * P_G_p * P_G_p   +   315.0 * P_G * P_G * P_G_pp );
 		return dummy;
