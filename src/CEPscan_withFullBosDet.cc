@@ -198,7 +198,7 @@ int main(int narg,char **arg)
 								{
 									cerr <<"Error, no minimum found in testvalue interval." <<endl;
 									skipValue=true;
-									break;
+// 									break;
 								}
 							}
 							else
@@ -245,6 +245,7 @@ int main(int narg,char **arg)
 						dummy.mHSquared = (negative_divergent)?(+1.0/log(1.0)):((skipValue)?log(1.0)/log(1.0):CEP.compute_CEP_withFullBosDet_secondDerivative(CEP.get_actual_minimum()));
 						dummy.potential = (negative_divergent)?(-1.0/log(1.0)):((skipValue)?log(1.0)/log(1.0):CEP.get_potentialAtMinimum());
 						results.push_back(dummy);
+// 						cout <<"result pushed" <<endl;
 					}//m0Squared_or_kappa
 				}//lambda
 			}//lambda_6
