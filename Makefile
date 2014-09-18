@@ -1,4 +1,4 @@
-CXX=g++-4.7
+CXX=g++
 CXXFLAGS= -Wall -Wextra -Wno-long-long -pedantic -O2
 
 # # CXX=icpc
@@ -64,6 +64,11 @@ plotPotential_withFullBosDet: ./src/plotPotential_withFullBosDet.o \
                              ./src/CEPscan_helper.o 
 	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
 
+test_CEP_withFullBosDet: ./src/test_CEP_withFullBosDet.o \
+                             ./src/CEP_withFullBosDet.o
+	${CXX} ${CXXFLAGS} ${INCL} ${LIBSLOC}  -o $@ $^ ${LIBS}; echo
+
+
 ###########################################3
 ###   OFILES for executables   ###
 
@@ -103,6 +108,9 @@ plotPotential_withFullBosDet: ./src/plotPotential_withFullBosDet.o \
                                      ./src/CEPscan_helper.h
 	cd ./src; make plotPotential_withFullBosDet.o
 
+./src/test_CEP_withFullBosDet.o: ./src/test_CEP_withFullBosDet.cc \
+                                ./src/CEP_withFullBosDet.h
+	cd ./src; make test_CEP_withFullBosDet.o; echo
 
 #############################################
 ### OFILES for libs

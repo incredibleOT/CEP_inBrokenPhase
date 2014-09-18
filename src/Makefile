@@ -1,4 +1,4 @@
-CXX=g++-4.7
+CXX=g++
 CXXFLAGS= -Wall -Wextra -Wno-long-long -pedantic -O2
 
 # # CXX=icpc
