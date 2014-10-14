@@ -143,6 +143,8 @@ class CEP_withFullBosDet
 	//will return true if no -inf occurs during scan, otherwise returns false
 	//if there is no global minimum, but for all values the function evaluated correctly, out* are all set to the same value
 	bool determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper);
+	//also returns the results
+	bool determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper, double &resMinimum, double &resLower, double &resUpper);
 	
 	int iterate_minimizer();
 	double get_actual_minimum();

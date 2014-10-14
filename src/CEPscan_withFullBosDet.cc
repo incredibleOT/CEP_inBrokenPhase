@@ -171,14 +171,15 @@ int main(int narg,char **arg)
 						bool negative_divergent(false);
 						
 						double min(0.0), lower(0.0), upper(0.0);
-						if( ! CEP.determine_startingPoints(parametersDouble["testvalue_min"], parametersDouble["testvalue_max"], parametersDouble["testvalue_step"], min, lower, upper) )
+						double res_min(0.0), res_lower(0.0), res_upper(0.0);
+						if( ! CEP.determine_startingPoints(parametersDouble["testvalue_min"], parametersDouble["testvalue_max"], parametersDouble["testvalue_step"], min, lower, upper, res_min, res_lower, res_upper) )
 						{
 							cerr <<"Error, negative divergence occured in testvalue interval" <<endl;
 							negative_divergent=true;
 						}
 						if(lower==upper)
 						{
-							if(lower==0.0 || lower== parametersDouble["testvalue_min"])
+							if(lower== parametersDouble["testvalue_min"])
 							{
 // 									cerr <<"assume true minimum between first two values" <<endl;
 								bool success(false);
@@ -190,7 +191,7 @@ int main(int narg,char **arg)
 									newLower=parametersDouble["testvalue_min"];
 									newStep/=10.0;
 									newUpper=newLower+10.0*newStep;
-									CEP.determine_startingPoints(newLower, newUpper, newStep, min, lower, upper);
+									CEP.determine_startingPoints(newLower, newUpper, newStep, min, lower, upper, res_min, res_lower, res_upper);
 									if(lower!=upper){ success=true; break; }
 								}
 // 									if(success){ cerr <<"success" <<endl; }
@@ -207,11 +208,25 @@ int main(int narg,char **arg)
 								skipValue=true;
 							}
 						}
-						if(lower==0.0){lower=parametersDouble["testvalue_min"]; }
+// 						if(lower==0.0){lower=parametersDouble["testvalue_min"]; }
+// 						std::cout.precision(15);
+// 						std::cout <<"lower: " <<lower <<"   min: " <<min <<"   upper: " <<upper <<std::endl;
+// 						std::cout <<"U(" <<lower <<")=" <<res_lower <<std::endl;
+// 						std::cout <<"U(" <<min <<")=" <<res_min <<std::endl;
+// 						std::cout <<"U(" <<upper <<")=" <<res_upper <<std::endl;
+// 						std::cout <<"U(" <<lower <<") > U(" <<min <<") yields: " << (CEP.compute_CEP_withFullBosDet(lower)> CEP.compute_CEP_withFullBosDet(min)) <<std::endl;
+// 						std::cout <<"U(" <<min <<") < U(" <<upper <<") yields: " << (CEP.compute_CEP_withFullBosDet(min)< CEP.compute_CEP_withFullBosDet(upper)) <<std::endl;
+						if(! ( res_lower > res_min &&  
+												res_min< res_upper ))
+						{
+							cerr <<"Error, no minimum found in testvalue interval." <<endl;
+							skipValue=true;
+						}
 						int num_of_iterations(0);
 						if(!skipValue)
 						{
 							CEP.initialize_minimizer(min, lower, upper);
+// 							std::cout <<"CEP initialized" <<endl;
 							num_of_iterations=CEP.iterate_minimizer_until_convergence();
 						}
 						if( num_of_iterations == -1 )
@@ -241,7 +256,7 @@ int main(int narg,char **arg)
 						dummy.lambda_6  = CEP.get_lambda_6();
 						dummy.yukawa_t  = CEP.get_yukawa_t();
 						dummy.yukawa_b  = CEP.get_yukawa_b();
-						dummy.minimum   = (skipValue)?(-1.0):(CEP.get_actual_minimum());
+						dummy.minimum   = (skipValue)?(log(1.0)/log(1.0)):(std::abs(CEP.get_actual_minimum()));
 						dummy.mHSquared = (negative_divergent)?(+1.0/log(1.0)):((skipValue)?log(1.0)/log(1.0):CEP.compute_CEP_withFullBosDet_secondDerivative(CEP.get_actual_minimum()));
 						dummy.potential = (negative_divergent)?(-1.0/log(1.0)):((skipValue)?log(1.0)/log(1.0):CEP.get_potentialAtMinimum());
 						results.push_back(dummy);

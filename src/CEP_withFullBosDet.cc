@@ -1555,10 +1555,71 @@ bool CEP_withFullBosDet::determine_startingPoints( double inLower, double inUppe
 	}
 	else
 	{
-		outMinimum=lowest; outLower=lowest-inStep; outUpper=lowest+inStep;
+// 		outMinimum=lowest; outLower=lowest-inStep; outUpper=lowest+inStep;
+		outMinimum=lowest;
+		outLower=*(--(trialPoints.find(lowest)));
+		outUpper=*(++(trialPoints.find(lowest)));
 		return true;
 	}
 }
+
+
+
+
+//this version also gives the results at minimum, lower and upper
+bool CEP_withFullBosDet::determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper, double &resMinimum, double &resLower, double &resUpper)
+{
+	const int MAXSCAN=1000;
+	if( (inUpper - inLower <= 0.0 || inStep <=0.0) )
+	{
+		std::cerr <<"Error, inconsitent scan range in CEP_withFullBosDet::determine_startingAndInitialize" <<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	int numberOfEntries=static_cast< int >( (inUpper-inLower)/inStep + 1.5);
+	if( numberOfEntries > MAXSCAN )
+	{
+		std::cerr << "Error, to many testValues in CEP_withFullBosDet::determine_startingAndInitialize." <<std::endl;
+		std::cerr << "Change MAXSCAN if neccessary" <<std::endl;
+	}
+	
+	std::map< double, double > trial_points_and_function;  //contains <trialpoint,  U(trialpoint) >
+	
+	std::pair< double, double > actual_point_and_result(inLower, compute_CEP_withFullBosDet(inLower));
+	std::pair< double, double > actual_minimum(actual_point_and_result);
+	//insert first pair
+	trial_points_and_function.insert( actual_point_and_result );
+	
+	//set trial points
+	for( int i=1; i<numberOfEntries; ++i)
+	{
+		actual_point_and_result=std::make_pair( inLower + static_cast< double >(i) *inStep, compute_CEP_withFullBosDet(inLower + static_cast< double >(i) *inStep) );
+		trial_points_and_function.insert( trial_points_and_function.end(), actual_point_and_result );
+		if( actual_point_and_result.second < actual_minimum.second ){ actual_minimum=actual_point_and_result; }
+	}
+	
+	if( actual_minimum.first==trial_points_and_function.begin()->first || actual_minimum.first==trial_points_and_function.rbegin()->first || actual_minimum.second == -1.0/log(1.0) )
+	{
+		outMinimum=actual_minimum.first; outLower=actual_minimum.first; outUpper=actual_minimum.first;
+		resMinimum=actual_minimum.second; resLower=actual_minimum.second; resUpper=actual_minimum.second; 
+		if(  actual_minimum.second == -1.0/log(1.0) ){ return false; }
+		else{ return true; }
+	}
+	else
+	{
+		
+		//outMinimum=lowest; outLower=lowest-inStep; outUpper=lowest+inStep; 
+		outMinimum=actual_minimum.first, resMinimum=actual_minimum.second;
+		std::map< double, double >::const_iterator iter(trial_points_and_function.find(outMinimum));
+		--iter;
+		outLower=iter->first, resLower=iter->second;
+		++(++iter);
+		outUpper=iter->first, resUpper=iter->second;
+		return true;
+	}
+}
+
+
+
 
 int CEP_withFullBosDet::iterate_minimizer()
 {
@@ -1570,6 +1631,9 @@ int CEP_withFullBosDet::iterate_minimizer()
 	iterator_status = gsl_min_fminimizer_iterate(minimizer);
 	return iterator_status;
 }
+
+
+
 
 double CEP_withFullBosDet::get_actual_minimum()
 {
