@@ -55,7 +55,6 @@ namespace CEPscan_helper
 		double minimum;
 		double mHSquared;
 		double potential;
-		
 	};
 	
 	bool printResultsVectorToStream(const std::vector< resultForOutput > &results, std::ostream &output);

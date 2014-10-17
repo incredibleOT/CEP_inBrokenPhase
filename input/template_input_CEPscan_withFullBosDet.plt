@@ -12,9 +12,9 @@ m0Squared                   0.15
 use_kappa                  0
 # scan_kappa            1
 # kappa                   0.12
-# kappa_min               -0.5
-# kappa_max               +0.5
-# kappa_step              +0.01
+# kappa_min               -0.1220
+# kappa_max               +0.1235
+# kappa_step              +0.00001
 
 # scan_lambda             1
 lambda                    -0.008
@@ -51,7 +51,7 @@ exclude_goldstones         0
 # rho                       1.0
 # r                         0.5
 
-## default: absolut_tolerance_for_minimization=1.0e-1, relative_tolerance_for_minimization=1.0e-7, tolerance_for_HiggsMassSquared=1.0e-5
+## default: absolut_tolerance_for_minimization=1.0e-7, relative_tolerance_for_minimization=1.0e-7,
 absolut_tolerance_for_minimization    1.0e-7
 relative_tolerance_for_minimization   1.0e-7
 
