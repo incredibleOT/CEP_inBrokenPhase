@@ -1431,21 +1431,18 @@ bool CEP_inBrokenPhase::initialize_minimizer( double minimum, double lower, doub
 }
 
 
-
-
-// int CEP_inBrokenPhase::determine_startingAndInitialize( double lower, double upper, double step )
 void CEP_inBrokenPhase::determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper)
 {
 	const int MAXSCAN=1000;
 	if( (inUpper - inLower <= 0.0 || inStep <=0.0) )
 	{
-		std::cerr <<"Error, inconsitent scan range in CEP_inBrokenPhase::determine_startingAndInitialize" <<std::endl;
+		std::cerr <<"Error, inconsitent scan range in CEP_withFullBosDet::determine_startingAndInitialize" <<std::endl;
 		exit(EXIT_FAILURE);
 	}
 	int numberOfEntries=static_cast< int >( (inUpper-inLower)/inStep + 1.5);
 	if( numberOfEntries > MAXSCAN )
 	{
-		std::cerr << "Error, to many testValues in CEP_inBrokenPhase::determine_startingAndInitialize." <<std::endl;
+		std::cerr << "Error, to many testValues in CEP_withFullBosDet::determine_startingAndInitialize." <<std::endl;
 		std::cerr << "Change MAXSCAN if neccessary" <<std::endl;
 	}
 	std::set< double > trialPoints;
@@ -1464,15 +1461,63 @@ void CEP_inBrokenPhase::determine_startingPoints( double inLower, double inUpper
 		std::cout <<"trial: value= " <<iter->second <<"   pot: " <<iter->first <<std::endl;
 	}*/
 	double lowest=trial_functionAndPoints.begin()->second;
-	if( lowest==*trialPoints.begin() || lowest==*trialPoints.rbegin() )
+	if( lowest==*trialPoints.begin() || lowest==*trialPoints.rbegin() || trial_functionAndPoints.begin()->first == -1.0/log(1.0) )
 	{
 		outMinimum=lowest; outLower=lowest; outUpper=lowest;
+		if( trial_functionAndPoints.begin()->first == -1.0/log(1.0) ){ return; }
+		else{ return ; }
 	}
 	else
 	{
-		outMinimum=lowest; outLower=lowest-inStep; outUpper=lowest+inStep;
+// 		outMinimum=lowest; outLower=lowest-inStep; outUpper=lowest+inStep;
+		outMinimum=lowest;
+		outLower=*(--(trialPoints.find(lowest)));
+		outUpper=*(++(trialPoints.find(lowest)));
+		return;
 	}
 }
+
+
+// int CEP_inBrokenPhase::determine_startingAndInitialize( double lower, double upper, double step )
+// void CEP_inBrokenPhase::determine_startingPoints( double inLower, double inUpper, double inStep, double &outMinimum, double &outLower,double &outUpper)
+// {
+// 	const int MAXSCAN=1000;
+// 	if( (inUpper - inLower <= 0.0 || inStep <=0.0) )
+// 	{
+// 		std::cerr <<"Error, inconsitent scan range in CEP_inBrokenPhase::determine_startingAndInitialize" <<std::endl;
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	int numberOfEntries=static_cast< int >( (inUpper-inLower)/inStep + 1.5);
+// 	if( numberOfEntries > MAXSCAN )
+// 	{
+// 		std::cerr << "Error, to many testValues in CEP_inBrokenPhase::determine_startingAndInitialize." <<std::endl;
+// 		std::cerr << "Change MAXSCAN if neccessary" <<std::endl;
+// 	}
+// 	std::set< double > trialPoints;
+// 	for( int i=0; i<numberOfEntries; ++i)
+// 	{
+// 		trialPoints.insert( inLower + static_cast< double >(i) *inStep);
+// 	}
+// 	std::map< double, double > trial_functionAndPoints;
+// 	for( std::set< double >::const_iterator iter=trialPoints.begin(); iter!=trialPoints.end(); ++iter )
+// 	{
+// 		trial_functionAndPoints.insert( std::make_pair( compute_CEP_inBrokenPhase( *iter ), *iter ) );
+// 	}
+// 	//debug
+// 	/*for( std::map< double, double >::const_iterator iter=trial_functionAndPoints.begin(); iter !=trial_functionAndPoints.end(); ++iter)
+// 	{
+// 		std::cout <<"trial: value= " <<iter->second <<"   pot: " <<iter->first <<std::endl;
+// 	}*/
+// 	double lowest=trial_functionAndPoints.begin()->second;
+// 	if( lowest==*trialPoints.begin() || lowest==*trialPoints.rbegin() )
+// 	{
+// 		outMinimum=lowest; outLower=lowest; outUpper=lowest;
+// 	}
+// 	else
+// 	{
+// 		outMinimum=lowest; outLower=lowest-inStep; outUpper=lowest+inStep;
+// 	}
+// }
 
 int CEP_inBrokenPhase::iterate_minimizer()
 {

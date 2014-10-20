@@ -251,7 +251,7 @@ int main(int narg,char **arg)
 // 								skipValue=true;
 // 								break;
 							}
-							if(lower==0.0){lower=parametersDouble["testvalue_min"]; }
+// 							if(lower==0.0){lower=parametersDouble["testvalue_min"]; }
 							
 							
 // 							cout <<"start with interval " <<lower <<"<" <<min <<"<" <<upper <<endl;

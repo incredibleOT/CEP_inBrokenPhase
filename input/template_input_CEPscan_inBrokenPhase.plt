@@ -12,7 +12,7 @@ m0Squared                   0.15
 use_kappa                  0
 # scan_kappa            1
 # kappa                   0.12
-# kappa_min               -0.1220
+# kappa_min               +0.1220
 # kappa_max               +0.1235
 # kappa_step              +0.00001
 

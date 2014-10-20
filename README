@@ -1,19 +1,66 @@
-This Program should determin the "phase structure" from the CEP, while still assuming to be in the broken phase.
-using the potential in chapter 9 of the notes
+1) General
+This Programs should determin the "phase structure" from the CEP, while still assuming to be in the broken phase.
+using the potentials in chapter 9 and 10 of the notes.
 
+There are two potentials being used. The one that was already used by Phillip Gerhold, where teh Higgs boson mass appears
+in the Potential itself requiring an iterative approach to find a self consistent solution (U_1) and a n ansatz where 
+the gaussian contributions from the self couplings are taken into acocunt when integrating out the non-zero modes of the bosonic
+field leading to logarithmic corrections to the potential (U_2). The second approach does not rely on a self consistent sollution.
 
-The prrinciple is the following:
+2) Programs
+a) For determining the phase structure there are two programs:
+CEPscan_inBrokenPhase (using U_1) and CEPscan_withFullBosDet (using U_2).
+The principle is the following:
 
  - we use the continuum notation (m_0^2, lambda, y, lambda_6), but keep all lattice expressions like sums etc
- - The potential we use is the one for the determination of the lower bound
  - we set all parameters, also m_0^2
  - now the program iterates
    {
  	- determine minimum
  	- determin mass in the minimum
- 	- set mass in propagator sum
+ 	- iteratre until a self consistent sollution is found for U_1
    }
-   until the minimum is stable
-   
-Another ansatz is , while still assuming to be in the broken phase to take a larger part from the interaction into account when doing the 
-gaussian integration using the potential given in chapter 10 of the notes
+
+b) For both potentials there is a program which allows to get teh potential for a wider range of $\hat v$. This exists for both potentials:
+plotPotential_inBrokenPhase (U_1) and plotPotential_withFullBosDet(U_2).
+
+3) How to use
+Each program works with input files containing a name-values pair in each line. There are template input files for each program. 
+Most of them are somewhat self explaining.
+
+The parameters for CEPscan_inBrokenPhase and CEPscan_withFullBosDet that both have in common are:
+ - L_s, L_t, antiperiodic_L_t : spatial, temporal extent and whether boundary conditions for the fermions in time are atiperiodic
+ - scan_m0Squared : Whether a scan in m_0^2 should be perfomed (in contrast to only use 1 value)
+ - m0Squared: If there should be o scan performed, but only a single value will be used, set m0^2 by this parameter
+ - m0Squared_min, m0Squared_max, m0Squared_step: If a scan should be performed, the scan will be done from m0Squared_min to m0Squared_max in
+   steps of m0Squared_step
+ - Similarly to teh way it works for m0Squared, te parameters lambda, lambda_6, yukawa_t and yukawa_ratio work, where yukawa_ratio is y_t/y_b
+ - use_kappa: If this flag is set, kappa will be used as input instead of m0^2. In this case any parameters for m0^2 are ignored. Internally m0^2 will be used,
+   but m0^2 will be determined from kappa and lambda
+ - N_f, rho, r: N_f, rho (from overlap) and wilson parameter (if not set, default values will be used)
+ - absolut_tolerance_for_minimization, relative_tolerance_for_minimization: Those set the tolerance for the minimizer in finding the location of the minimum
+ - minimization_algorithm: The algorithm used for the minimizer (choice between the three minimizers offered by gsl)
+ - max_numer_of_iterations_minimizer: maximal number of iterations for the inimizer
+ - testvalue_min, testvalue_max, testvalue_step: before the minimizer starts, a rough scan is performed to find an initial interval for the minimization
+   procedure. It is neccessary to find an interval which contains the minimum. If the minimum is at the border of the interval, the program will fail.
+   This especially important, if the minimum can be at zero, which can only happen, if antiperiodic BCs are turned on. In that case, the start interval should 
+   start at negative field values. Since the potential is symmetric, findin a minimum at $\hat v <0$ is not a problem.
+ - outputfile: The output file. For the name one can use abbreviations that will be replaced by the parameters used, so you do
+   not have to change the output file name each time you change the parameters. The following things are possible:
+   [Ls], [Lt]: will be replaced by Lxx and Tyy with xx being L_s and yy being L_t
+   [l]: will be replaced by l_xx with xx being the lambda-value used if just one value for lambda is used. In case of a scan being performed,
+        the replacemet will be l_yy_zz with yy being lambda_min and zz being lambda_z
+   [l6], [y], [yr]: the same as for [l] but with lambda_6, yukawa_t and yukawa_ratio
+   [m0Sq_k]: Also works the same but with m0Sq or k in case of usage of m0Squared or kappa
+
+The following parameters are only relevant for CEPscan_inBrokenPhase:
+ - tolerance_for_HiggsMassSquared: The tolerance for the Higgs boson mass which stops the itartion process for finding a self consistent solution
+ - max_numer_of_iterations_HiggsMassSquared: Maximal number of iterations in finding the Higgs boson mass
+ - use_listOfFermContr, listOfFermContr: Whether a file with the fermionic contributions for a set of $\hat v$ should be used and its location.
+   Since the computation of the fermionic contributions dominates the cmputational effort, it might be reasonable to store those and get the 
+   contributions from that file. The program  generate_list_of_fermionic_contribution generates those list. (can in principle also be used for 
+   CEPscan_withFullBosDet, but it is not implemented there.
+ - exclude_goldstones: if set, goldstone contributions will be ignored
+ 
+ 
+The Input parameter files for plotPotential_inBrokenPhase and plotPotential_withFullBosDet work similarly, but without the possibility to scan in parameters
